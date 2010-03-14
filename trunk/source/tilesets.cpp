@@ -42,7 +42,7 @@ uint16 map16Overlays [256][4] =
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
-{0x03CC, 0x03CD, 0x03CE, 0x03CF},
+{0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
@@ -303,7 +303,7 @@ uint16 map16ExtraData[256][4] =
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
-{0x0000, 0x0000, 0x0000, 0x0000},
+{0x43CC, 0x43CD, 0x43CE, 0x43CF},
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
 {0x0000, 0x0000, 0x0000, 0x0000},
@@ -587,17 +587,37 @@ void loadTilesets(int tileset)
 	dmaCopySafe(&tilegfxTiles, BG_TILE_RAM(0)+0x6000, tilegfxTilesLen);
 
 	//Load the Palettes
-	vramSetBankG(VRAM_G_LCD);
-	loadCompressedFileFromROM(jyoytu_ncl_fileIDs[0][region], VRAM_G_EXT_PALETTE[0]);
+	vramSetBankE(VRAM_E_LCD);
+	loadCompressedFileFromROM(jyoytu_ncl_fileIDs[0][region], VRAM_E_EXT_PALETTE[2]);
 	loadCompressedFileFromROM(
 		getFileIDFromTable(Table_TS_NCL, tileset),
-		VRAM_G_EXT_PALETTE[0][2]
+		VRAM_E_EXT_PALETTE[2][2]
 	);
-	loadCompressedFileFromROM(subnohara_ncl_fileID[region], VRAM_G_EXT_PALETTE[0][6]);
-	dmaCopySafe(&tilegfxPal, VRAM_G_EXT_PALETTE[0][4], tilegfxPalLen);
-	dmaCopySafe(&tilegfxPal, VRAM_G_EXT_PALETTE[1][0], tilegfxPalLen);
-	vramSetBankG(VRAM_G_BG_EXT_PALETTE_SLOT23);
+	loadCompressedFileFromROM(subnohara_ncl_fileID[region], VRAM_E_EXT_PALETTE[2][6]);
+	dmaCopySafe(&tilegfxPal, VRAM_E_EXT_PALETTE[2][4], tilegfxPalLen);
+	dmaCopySafe(&tilegfxPal, VRAM_E_EXT_PALETTE[3][0], tilegfxPalLen);
 	
+	//Create the "selected" blueish effect
+	for(int i = 0; i < 8; i++)
+	{
+		for(int j = 0; j < 256; j++)
+		{
+			uint16 col = VRAM_E_EXT_PALETTE[2][i][j];
+			uint16 r = (col >> 0) & 0x1F;
+			uint16 g = (col >> 5) & 0x1F;
+			uint16 b = (col >> 10) & 0x1F;
+			uint16 a = (col >> 15) & 0x1;
+			r = (r + 31)/2;
+			g = (g + 0)/2;
+			b = (b + 0)/2;
+			VRAM_E_EXT_PALETTE[2][i+8][j] = 
+				r << 0 |
+				g << 5 |
+				b << 10 |
+				a << 15;
+		}
+	}
+	vramSetBankE(VRAM_E_BG_EXT_PALETTE);
 	
 	//Load the MAP16!
 	loadFileFromROMInto(jyoytu_pnl_fileID[region], &map16Data);

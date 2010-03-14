@@ -37,6 +37,7 @@ class levelSprite
 };
 
 extern vector<levelObject> objects;
+extern bool *selectedObjects;
 extern uint levelFileID, bgdatFileID;
 
 void loadLevel(uint levelFileIDp, uint bgdatFileIDp);
