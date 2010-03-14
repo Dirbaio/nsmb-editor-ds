@@ -2,6 +2,8 @@
 
 vector<levelObject> objects;
 vector<levelSprite> sprites;
+bool *selectedObjects;
+uint selectedObjectsSize;
 
 uint levelFileID, bgdatFileID;
 
@@ -30,6 +32,8 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 	
 	uint objCount = fileSize / 10;
 	objects = vector<levelObject>(objCount);
+	selectedObjects = new bool[objCount];
+	selectedObjectsSize = objCount;
 	
 	uint i;
 	uint filePos = 0;
@@ -43,6 +47,7 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 
 		objects[i].tilesetNum = objects[i].objNum >> 12;
 		objects[i].objNum &= 0x0FFF;
+		selectedObjects[i] = true;
 		filePos += 10;
 	}
 	

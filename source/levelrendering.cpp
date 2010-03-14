@@ -1,6 +1,7 @@
 #include "levelrendering.hpp"
 
 uint xMin, xMax, yMin, yMax;
+bool renderingSelected;
 
 bool onScreen(levelObject& obj)
 {
@@ -18,6 +19,8 @@ inline void setTileXY(uint x, uint y, uint16 tile)
 	uint16 *map = BG_MAP_RAM(0x20);
 //	if(x >= 32) map += 32*32;
 //	if(y >= 32) map += 32*32*2;
+	if(renderingSelected)
+		tile |= 1<<15;
 	map[(x%64) + (y%64)*64] = tile;
 	
 }
@@ -388,6 +391,7 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 	{
 		if(onScreen(objects[i]))
 		{
+			renderingSelected = selectedObjects[i];
 			renderObject(objects[i].objNum, objects[i].tilesetNum, objects[i].x, objects[i].y, objects[i].width, objects[i].height);
 		}
 	}
