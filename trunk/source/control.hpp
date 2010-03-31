@@ -8,6 +8,9 @@
 #include <string.h>
 #include <dirent.h>
 
+#include "editor.hpp"
+#include "ui.hpp"
+
 using namespace std;
 
 #ifndef _CONTROL_H

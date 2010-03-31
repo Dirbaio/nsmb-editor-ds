@@ -32,4 +32,5 @@ extern uint8 *objectDefinitions[3];
 void loadTilesets(int tileset);
 void unloadTilesets();
 
+void shadeExtPal(uint p);
 #endif
