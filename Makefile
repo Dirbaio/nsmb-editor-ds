@@ -23,6 +23,10 @@ INCLUDES	:=	include
 DATA		:=	data  
 GRAPHICS	:=	gfx  
 
+GAME_TITLE     :=   NSMB Level Editor
+GAME_SUBTITLE1 :=	By Dirbaio
+GAME_SUBTITLE2 :=	jul.rustedlogic.net
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -71,7 +75,8 @@ CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
- 
+
+
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
 #---------------------------------------------------------------------------------

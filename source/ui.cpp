@@ -9,25 +9,29 @@ bool uiOn = false;
 #define BTN_SAVE 0
 #define BTN_SCROLL 1
 #define BTN_MOVE 2
+#define BTN_RESIZE 2
 #define BTN_DELETE 3
 #define BTN_CLONE 4
 #define BTN_PALETTE 5
-#define BTN_OBJ 6
+#define BTN_OBJECT 6
 #define BTN_ENTRANCE 7
 #define BTN_PATH 8
-#define BTN_PPATH 9
+#define BTN_PROGPATH 9
 #define BTN_VIEW 10
 #define BTN_ZONE 11
 #define BTN_EMPTY 17
 
 bool saving = false;
-uint16 *bg0ptr;
+bool paletteOn = false;
+
+uint16 *bg1ptr;
 
 inline void setTileXY(uint x, uint y, uint16 tile, bool sel)
 {
+//	iprintf("%d %d: %d\n", x, y, tile);
 	if(sel)
 		tile |= 1<<15;
-	bg0ptr[(x%32) + (y%32)*32] = tile;
+	bg1ptr[(x%32) + (y%32)*32] = tile;
 	
 }
 
@@ -42,18 +46,33 @@ void renderButton(int pos, int btn, bool sel)
 
 void renderUI()
 {
-	bg0ptr= bgGetMapPtr(1);
+	bg1ptr=  (uint16*)0x0601C000;
+	iprintf("%x", bg1ptr);
 	for(int x = 0; x < 16; x++)
 		renderButton(x, BTN_EMPTY, false);
-		
+	
 	renderButton(0, BTN_SAVE, saving);
+	
+	renderButton(2, BTN_SCROLL, editAction == EDITACTION_SCROLL);
+	renderButton(3, BTN_MOVE, editAction == EDITACTION_MOVE);
+	renderButton(4, BTN_RESIZE, editAction == EDITACTION_RESIZE);
+	renderButton(5, BTN_CLONE, editAction == EDITACTION_CLONE);
+	
+	renderButton(7, BTN_OBJECT, editMode == EDITMODE_OBJECTS);
+	renderButton(8, BTN_ENTRANCE, editMode == EDITMODE_ENTRANCES);
+	renderButton(9, BTN_PATH, editMode == EDITMODE_PATHS);
+	renderButton(10, BTN_PROGPATH, editMode == EDITMODE_PROGPATHS);
+	renderButton(11, BTN_VIEW, editMode == EDITMODE_VIEWS);
+	renderButton(12, BTN_ZONE, editMode == EDITMODE_ZONES);
+	
+	renderButton(14, BTN_PALETTE, paletteOn);
 }
 
 void uiShow()
 {
 	uiOn = true;
 	bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 0x18, 0x4);
-	dmaCopySafe(&uiGraphicsTiles, bgGetGfxPtr(1) + 64, uiGraphicsTilesLen);
+	dmaCopySafe(&uiGraphicsTiles, bgGetGfxPtr(1) + 128, uiGraphicsTilesLen);
 	
 	vramSetBankE(VRAM_E_LCD);
 	dmaCopySafe(&uiGraphicsPal, VRAM_E_EXT_PALETTE[1][0], uiGraphicsPalLen);

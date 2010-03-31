@@ -576,6 +576,16 @@ void createOverrides()
 	}
 }
 
+/** \brief  an array of 256 15-bit RGB values*/
+typedef u16 _palette[256];
+
+/** \brief  An array of 16 256-color palettes */
+typedef _palette _ext_palette[16];
+
+/** \brief  Used for accessing vram E as an extended palette */
+#define VRAM_E_EXT_PALETTE ((_ext_palette *)VRAM_E)
+
+
 void loadTilesets(int tileset)
 {
 
