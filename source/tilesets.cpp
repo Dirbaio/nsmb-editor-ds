@@ -529,6 +529,7 @@ uint16 map16ExtraData[256][4] =
 objPointer *objectIndex[3];
 uint8 *objectDefinitions[3];
 
+/*
 #define NONE (0<<10)
 #define HORZ (1<<10)
 #define VERT (2<<10)
@@ -559,6 +560,7 @@ void putTile(uint16 *loc, uint tile, uint16 flips)
 		swap(loc[1], loc[3]);
 	}
 }
+*/
 
 void createOverrides()
 {
@@ -578,13 +580,13 @@ void loadTilesets(int tileset)
 {
 
 	//Load graphics
-	loadCompressedFileFromROM(jyoytu_ncg_fileID[region], BG_TILE_RAM(0));
+	loadCompressedFileFromROM(jyoytu_ncg_fileID[region], bgGetGfxPtr(2));
 	loadCompressedFileFromROM(
 		getFileIDFromTable(Table_TS_NCG, tileset),
-		BG_TILE_RAM(0)+0x1800
+		bgGetGfxPtr(2)+0x1800
 	);
-	loadCompressedFileFromROM(subnohara_ncg_fileID[region], BG_TILE_RAM(0)+0x5000);
-	dmaCopySafe(&tilegfxTiles, BG_TILE_RAM(0)+0x6000, tilegfxTilesLen);
+	loadCompressedFileFromROM(subnohara_ncg_fileID[region], bgGetGfxPtr(2)+0x5000);
+	dmaCopySafe(&tilegfxTiles, bgGetGfxPtr(2)+0x6000, tilegfxTilesLen);
 
 	//Load the Palettes
 	vramSetBankE(VRAM_E_LCD);
@@ -596,27 +598,8 @@ void loadTilesets(int tileset)
 	loadCompressedFileFromROM(subnohara_ncl_fileID[region], VRAM_E_EXT_PALETTE[2][6]);
 	dmaCopySafe(&tilegfxPal, VRAM_E_EXT_PALETTE[2][4], tilegfxPalLen);
 	dmaCopySafe(&tilegfxPal, VRAM_E_EXT_PALETTE[3][0], tilegfxPalLen);
-	
-	//Create the "selected" blueish effect
-	for(int i = 0; i < 8; i++)
-	{
-		for(int j = 0; j < 256; j++)
-		{
-			uint16 col = VRAM_E_EXT_PALETTE[2][i][j];
-			uint16 r = (col >> 0) & 0x1F;
-			uint16 g = (col >> 5) & 0x1F;
-			uint16 b = (col >> 10) & 0x1F;
-			uint16 a = (col >> 15) & 0x1;
-			r = (r + 31)/2;
-			g = (g + 0)/2;
-			b = (b + 0)/2;
-			VRAM_E_EXT_PALETTE[2][i+8][j] = 
-				r << 0 |
-				g << 5 |
-				b << 10 |
-				a << 15;
-		}
-	}
+	shadeExtPal(2);
+	shadeExtPal(3);
 	vramSetBankE(VRAM_E_BG_EXT_PALETTE);
 	
 	//Load the MAP16!
@@ -648,4 +631,29 @@ void unloadTilesets()
 	free(objectDefinitions[0]);
 	free(objectDefinitions[1]);
 	free(objectDefinitions[2]);
+}
+
+void shadeExtPal(uint p)
+{
+
+	//Create the "selected" blueish effect
+	for(int i = 0; i < 8; i++)
+	{
+		for(int j = 0; j < 256; j++)
+		{
+			uint16 col = VRAM_E_EXT_PALETTE[p][i][j];
+			uint16 r = (col >> 0) & 0x1F;
+			uint16 g = (col >> 5) & 0x1F;
+			uint16 b = (col >> 10) & 0x1F;
+			uint16 a = (col >> 15) & 0x1;
+			r = (r + 0)/2;
+			g = (g + 0)/2;
+			b = (b + 31)/2;
+			VRAM_E_EXT_PALETTE[p][i+8][j] = 
+				r << 0 |
+				g << 5 |
+				b << 10 |
+				a << 15;
+		}
+	}
 }

@@ -3,6 +3,9 @@
 uint xMin, xMax, yMin, yMax;
 bool renderingSelected;
 
+uint16 *bg2ptr;
+uint16 *bg3ptr;
+
 bool onScreen(levelObject& obj)
 {
 	if(obj.x > xMax) return false;
@@ -14,22 +17,15 @@ bool onScreen(levelObject& obj)
 
 inline void setTileXY(uint x, uint y, uint16 tile)
 {
-//	if(tile != 0)
-//		iprintf("-");
-	uint16 *map = BG_MAP_RAM(0x20);
-//	if(x >= 32) map += 32*32;
-//	if(y >= 32) map += 32*32*2;
 	if(renderingSelected)
 		tile |= 1<<15;
-	map[(x%64) + (y%64)*64] = tile;
+	bg2ptr[(x%64) + (y%64)*64] = tile;
 	
 }
 
 inline void setTileXYb(uint x, uint y, uint16 tile)
 {
-	uint16 *map = BG_MAP_RAM(0x24);
-	map[(x%64) + (y%64)*64] = tile;
-	
+	bg3ptr[(x%64) + (y%64)*64] = tile;
 }
 
 inline void setMap16TileXY(uint x, uint y, uint16 tile)
@@ -370,6 +366,13 @@ void renderObject(uint objNum, uint tilesetNum, uint xp, uint yp, uint w, uint h
 
 void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 {
+	bg2ptr = (uint16*)0x06018000;
+	bg3ptr = (uint16*)0x0601A000;
+	
+	/*
+	iprintf("r\n");
+	iprintf("bg2 %x\n", bg2ptr);
+	iprintf("bg3 %x\n", bg2ptr);*/
 	
 	xMin = xMins;
 	yMin = yMins;

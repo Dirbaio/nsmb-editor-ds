@@ -10,6 +10,7 @@
 #include "tilesets.hpp"
 #include "level.hpp"
 #include "levelrendering.hpp"
+#include "ui.hpp"
 
 #define mapxy(x, y) map[x+y*32]
 
@@ -32,7 +33,7 @@ int main(void)
 	lcdMainOnBottom();
 	
 //	REG_POWERCNT = POWER_ALL_2D;
-	REG_DISPCNT = MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_BG_EXT_PALETTE | DISPLAY_SCREEN_BASE(1);
+	REG_DISPCNT = MODE_5_2D | DISPLAY_BG_EXT_PALETTE | DISPLAY_SCREEN_BASE(1);
 
 	vramSetBankA(VRAM_A_MAIN_BG);
 
@@ -43,18 +44,22 @@ int main(void)
 		
     	iprintf("Loading tilesets!\n");
 	}
+	uiShow();
 	
 	uint lev = 0;
 	uint fid = calcLevelFileID(lev);
-	loadLevel(fid, fid+1);	
-	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0, 0);
+	loadLevel(fid, fid+1);
+	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0x10, 0);
+	bgShow(2);
 	bgSetPriority(2, 1);
 	REG_BG2CNT |= BG_WRAP_ON;
-	bgInit(3, BgType_ExRotation, BgSize_ER_512x512, 4, 0);
+	bgInit(3, BgType_ExRotation, BgSize_ER_512x512, 0x14, 0);
+	bgShow(3);
 	bgSetPriority(3, 0);
 	REG_BG3CNT |= BG_WRAP_ON;
-	
+	bgUpdate();
 	iprintf("Done!\n");
+	
 	touchPosition touch;
 	int levelx = 0;
 	int levely = 0;
@@ -184,6 +189,7 @@ int main(void)
 			}	
 			lastPage = currPage;
 		}*/
+		
 		swiWaitForVBlank();
 	}
 }
