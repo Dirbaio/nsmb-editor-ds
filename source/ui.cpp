@@ -91,5 +91,24 @@ void uiHide()
 
 void uiTouchDown(int x, int y)
 {
+	int bx = x / 16;
+	
+	switch(bx)
+	{
+		case 0: saveEditor(); break;
+		case 2: editAction = EDITACTION_SCROLL; break;
+		case 3: editAction = EDITACTION_MOVE  ; break;
+		case 4: editAction = EDITACTION_RESIZE; break;
+		case 5: editAction = EDITACTION_CLONE ; break;
+		
+		case 7 : editMode  = EDITMODE_OBJECTS  ; break;
+		case 8 : editMode  = EDITMODE_ENTRANCES; break;
+		case 9 : editMode  = EDITMODE_PATHS    ; break;
+		case 10: editMode  = EDITMODE_PROGPATHS; break;
+		case 11: editMode  = EDITMODE_VIEWS    ; break;
+		case 12: editMode  = EDITMODE_ZONES    ; break;
+	}
+	
+	renderUI();
 }
 

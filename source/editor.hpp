@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+
+#include "level.hpp"
+#include "levelrendering.hpp"
+
 using namespace std;
 
 #ifndef _EDITOR_H
@@ -24,8 +28,9 @@ using namespace std;
 extern uint editMode;
 extern uint editAction;
 
-void load(uint level);
-void editorTouchDown(uint32 x, uint y);
-void editorTouchMoved(int x, int y);
+void loadEditor(uint level);
+void editorTouchDown(uint x, uint y);
+void editorTouchMoved(uint x, uint y);
+void saveEditor();
 
 #endif

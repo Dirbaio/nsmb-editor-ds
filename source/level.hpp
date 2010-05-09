@@ -16,13 +16,19 @@ using namespace std;
 #ifndef _LEVEL_H
 #define _LEVEL_H
 
-class levelObject
+class LevelElement
+{
+	public:
+	uint x, y;
+	uint tx, ty;
+	bool selected;
+};
+
+class LevelObject : public LevelElement
 {
 	public:
 	uint objNum;
 	uint tilesetNum;
-	uint x, y;
-	uint width, height;
 };
 
 struct blockPtr
@@ -31,13 +37,12 @@ struct blockPtr
 	uint32 size;
 };
 
-class levelSprite
+class LevelSprite
 {
 	
 };
 
-extern vector<levelObject> objects;
-extern bool *selectedObjects;
+extern vector<LevelObject> objects;
 extern uint levelFileID, bgdatFileID;
 
 void loadLevel(uint levelFileIDp, uint bgdatFileIDp);
