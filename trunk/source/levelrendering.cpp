@@ -6,12 +6,12 @@ bool renderingSelected;
 uint16 *bg2ptr;
 uint16 *bg3ptr;
 
-bool onScreen(levelObject& obj)
+bool onScreen(LevelObject& obj)
 {
 	if(obj.x > xMax) return false;
 	if(obj.y > yMax) return false;
-	if(obj.x + obj.width < xMin) return false;
-	if(obj.y + obj.height < yMin) return false;
+	if(obj.x + obj.tx < xMin) return false;
+	if(obj.y + obj.ty < yMin) return false;
 	return true;
 }
 
@@ -25,6 +25,8 @@ inline void setTileXY(uint x, uint y, uint16 tile)
 
 inline void setTileXYb(uint x, uint y, uint16 tile)
 {
+	if(renderingSelected)
+		tile |= 1<<15;
 	bg3ptr[(x%64) + (y%64)*64] = tile;
 }
 
@@ -394,8 +396,10 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 	{
 		if(onScreen(objects[i]))
 		{
-			renderingSelected = selectedObjects[i];
-			renderObject(objects[i].objNum, objects[i].tilesetNum, objects[i].x, objects[i].y, objects[i].width, objects[i].height);
+			renderingSelected = objects[i].selected;
+			renderObject(objects[i].objNum, objects[i].tilesetNum, 
+				objects[i].x, objects[i].y, 
+				objects[i].tx, objects[i].ty);
 		}
 	}
 }

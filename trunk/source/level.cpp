@@ -1,7 +1,7 @@
 #include "level.hpp"
 
-vector<levelObject> objects;
-vector<levelSprite> sprites;
+vector<LevelObject> objects;
+vector<LevelSprite> sprites;
 bool *selectedObjects;
 uint selectedObjectsSize;
 
@@ -12,6 +12,7 @@ blockPtr* blockPointers;
 
 uint8 *levelBlocks[14];
 
+bool loaded = false;
 
 inline uint min(uint a, uint b)
 {
@@ -24,6 +25,8 @@ inline uint max(uint a, uint b)
 
 void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 {
+	loaded = true;
+	
 	levelFileID = levelFileIDp;
 	bgdatFileID = bgdatFileIDp;
 	
@@ -31,9 +34,7 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 	uint  fileSize = getFileSizeFromROM(bgdatFileIDp);
 	
 	uint objCount = fileSize / 10;
-	objects = vector<levelObject>(objCount);
-	selectedObjects = new bool[objCount];
-	selectedObjectsSize = objCount;
+	objects = vector<LevelObject>(objCount);
 	
 	uint i;
 	uint filePos = 0;
@@ -42,12 +43,12 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 		objects[i].objNum = bgdatFile[filePos]     | (bgdatFile[filePos + 1] << 8);
 		objects[i].x =      bgdatFile[filePos + 2] | (bgdatFile[filePos + 3] << 8);
 		objects[i].y =      bgdatFile[filePos + 4] | (bgdatFile[filePos + 5] << 8);
-		objects[i].width =  bgdatFile[filePos + 6] | (bgdatFile[filePos + 7] << 8);
-		objects[i].height = bgdatFile[filePos + 8] | (bgdatFile[filePos + 9] << 8);
+		objects[i].tx =     bgdatFile[filePos + 6] | (bgdatFile[filePos + 7] << 8);
+		objects[i].ty =     bgdatFile[filePos + 8] | (bgdatFile[filePos + 9] << 8);
 
 		objects[i].tilesetNum = objects[i].objNum >> 12;
 		objects[i].objNum &= 0x0FFF;
-		selectedObjects[i] = true;
+		objects[i].selected = false;
 		filePos += 10;
 	}
 	
@@ -63,6 +64,10 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 
 void unloadLevel()
 {
+	if(!loaded) return;
+	
 	free(levelFile);
 	unloadTilesets();
+	
+	loaded = false;
 }
