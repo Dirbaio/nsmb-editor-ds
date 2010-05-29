@@ -30,6 +30,16 @@ inline void setTileXYb(uint x, uint y, uint16 tile)
 	bg3ptr[(x%64) + (y%64)*64] = tile;
 }
 
+inline uint16 getTileXY(uint x, uint y)
+{
+	return bg2ptr[(x%64) + (y%64)*64];	
+}
+
+inline uint16 getTileXYb(uint x, uint y)
+{
+	return bg3ptr[(x%64) + (y%64)*64];
+}
+
 inline void setMap16TileXY(uint x, uint y, uint16 tile)
 {
 	if(x < xMin || x > xMax) return;
@@ -365,6 +375,65 @@ void renderObject(uint objNum, uint tilesetNum, uint xp, uint yp, uint w, uint h
 }
 
 
+void renderLevelSprites(uint xMins, uint xMaxs, uint yMins, uint yMaxs, uint xCam, uint yCam)
+{
+	return;
+	
+	xMin = xMins;
+	yMin = yMins;
+	xMax = xMaxs;
+	yMax = yMaxs;
+	
+	for(uint i = 0; i < objects.size(); i++)
+	{
+		if(onScreen(objects[i]))
+		{
+			renderRect((objects[i].x-xCam)*16, (objects[i].y-yCam)*16, 
+				objects[i].tx*16, objects[i].ty*16);
+		}
+	}
+}
+
+void renderTileLineVert(int x, int y, int linetile)
+{
+	uint16 cur = getTileXYb(x, y);
+	if(cur == linetile) //hor
+		cur = linetile+2; //vert+hor
+	else if(cur != linetile+2) //if nothing
+		cur = linetile+1; //vert
+		
+	setTileXYb(x, y, cur);
+}
+
+void renderTileLineHor(int x, int y, int linetile)
+{
+	uint16 cur = getTileXYb(x, y);
+	if(cur == linetile+1) //vert
+		cur = linetile+2; //vert+hor
+	else if(cur != linetile+2) //if nothing
+		cur = linetile; //hor
+		
+	setTileXYb(x, y, cur);
+}
+
+void renderTileRect(int xx, int yy, int tx, int ty, int linetile)
+{
+	xx *= 2;
+	yy *= 2;
+	tx *= 2;
+	ty *= 2;
+	
+	for(int x = 0; x < tx; x++)
+	{
+		renderTileLineHor(x+xx, yy, linetile);
+		renderTileLineHor(x+xx, yy+ty, linetile);
+	}
+	for(int y = 0; y < ty; y++)
+	{
+		renderTileLineVert(xx, y+yy, linetile);
+		renderTileLineVert(xx+tx, y+yy, linetile);
+	}
+}
 
 void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 {
@@ -402,6 +471,19 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 				objects[i].tx, objects[i].ty);
 		}
 	}
+	
+	renderingSelected = false;
+	
+	for(uint i = 0; i < objects.size(); i++)
+	{
+		if(onScreen(objects[i]))
+		{
+			if(objects[i].selected)
+				renderTileRect(objects[i].x, objects[i].y,
+					objects[i].tx, objects[i].ty, 0x3e9);
+			
+		}
+	}
 }
 
 
@@ -413,4 +495,3 @@ void load()
 {
 	
 }
-

@@ -21,16 +21,18 @@
 int main(void)  
 {
 	consoleDemoInit(); 
-	iprintf("Helloooooooo World!\n");
+	iprintf("NSMB Editor DS!\n");
+	iprintf("By Dirbaio\n\n");
+	iprintf("Compiled %s %s\n\n", __DATE__, __TIME__);
 	
 	BG_PALETTE[0] = 0xEE0E;
 	
 	lcdMainOnBottom();
 	
 //	REG_POWERCNT = POWER_ALL_2D;
-	REG_DISPCNT = MODE_5_2D | DISPLAY_BG_EXT_PALETTE | DISPLAY_SCREEN_BASE(1);
+	REG_DISPCNT = MODE_5_2D | DISPLAY_BG_EXT_PALETTE | DISPLAY_SPR_EXT_PALETTE | DISPLAY_SCREEN_BASE(1);
 
-	vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
+	vramSetBankD(VRAM_D_MAIN_BG_0x06000000);
 	vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
 
 	if (fatInitDefault())
@@ -63,7 +65,11 @@ int main(void)
 	while(1)
 	{
 		checkControls();
+		editorRenderSprites();
 		swiWaitForVBlank();
-		oamUpdate(&oamMain);
+		renderSprite(10, 10, SpriteSize_16x16, 0, 0);
+		renderSprite(30, 10, SpriteSize_16x16, 2, 2);
+		renderRect(5, 5, 24, 56);
+		oamFrame();
 	}
 }

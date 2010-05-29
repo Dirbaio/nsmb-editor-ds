@@ -19,16 +19,16 @@ using namespace std;
 class LevelElement
 {
 	public:
-	uint x, y;
-	uint tx, ty;
+	int x, y;
+	int tx, ty;
 	bool selected;
 };
 
 class LevelObject : public LevelElement
 {
 	public:
-	uint objNum;
-	uint tilesetNum;
+	int objNum;
+	int tilesetNum;
 };
 
 struct blockPtr
@@ -37,9 +37,10 @@ struct blockPtr
 	uint32 size;
 };
 
-class LevelSprite
+class LevelSprite : public LevelElement
 {
-	
+	byte spritedata;
+	int spriteNum;
 };
 
 extern vector<LevelObject> objects;
