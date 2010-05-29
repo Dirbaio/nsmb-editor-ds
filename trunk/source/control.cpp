@@ -1,4 +1,4 @@
-#include "control.hpp"
+#include "control.h"
 
 uint keysNowHeld;
 uint keysNowPressed;

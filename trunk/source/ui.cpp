@@ -1,8 +1,8 @@
-#include "ui.hpp"
+#include "ui.h"
 #include "uiGraphics.h"
-#include "tilesets.hpp"
+#include "tilesets.h"
 
-#include "rom.hpp"
+#include "rom.h"
 
 bool uiOn = false;
 

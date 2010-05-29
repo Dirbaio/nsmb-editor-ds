@@ -1,9 +1,11 @@
-#include "tilesets.hpp"
-#include "rom.hpp"
+#include "tilesets.h"
+#include "rom.h"
 #include "tilegfx.h"
 
 uint16 map16Data [TOTAL_MAP16][4];
-uint16 map16Overlays [256][4] = 
+
+
+const uint16 map16Overlays [256][4] = 
 {
 
 {0x0000, 0x0000, 0x0000, 0x0000},
@@ -264,7 +266,7 @@ uint16 map16Overlays [256][4] =
 {0x0000, 0x0000, 0x0000, 0x0000},
 };
 
-uint16 map16ExtraData[256][4] = 
+const uint16 map16ExtraData[256][4] = 
 {
 
 {0x0000, 0x0000, 0x0000, 0x0000},
@@ -529,39 +531,6 @@ uint16 map16ExtraData[256][4] =
 objPointer *objectIndex[3];
 uint8 *objectDefinitions[3];
 
-/*
-#define NONE (0<<10)
-#define HORZ (1<<10)
-#define VERT (2<<10)
-#define BOTH (3<<10)
-#define PAL2 (4<<12)
-inline void swap(uint16& a, uint16& b)
-{
-	uint16 c = a;
-	a = b;
-	b = c;
-}
-
-void putTile(uint16 *loc, uint tile, uint16 flips)
-{
-	loc[0] = (tile*4  ) | flips;
-	loc[1] = (tile*4+1) | flips;
-	loc[2] = (tile*4+2) | flips;
-	loc[3] = (tile*4+3) | flips;
-	
-	if(flips & HORZ)
-	{
-		swap(loc[0], loc[1]);
-		swap(loc[2], loc[3]);
-	}
-	if(flips & VERT)
-	{
-		swap(loc[0], loc[2]);
-		swap(loc[1], loc[3]);
-	}
-}
-*/
-
 void createOverrides()
 {
 	for(int i = 0; i < 256; i++)
@@ -575,16 +544,6 @@ void createOverrides()
 		}
 	}
 }
-
-/** \brief  an array of 256 15-bit RGB values*/
-typedef u16 _palette[256];
-
-/** \brief  An array of 16 256-color palettes */
-typedef _palette _ext_palette[16];
-
-/** \brief  Used for accessing vram E as an extended palette */
-#define VRAM_E_EXT_PALETTE ((_ext_palette *)VRAM_E)
-
 
 void loadTilesets(int tileset)
 {
@@ -667,3 +626,5 @@ void shadeExtPal(uint p)
 		}
 	}
 }
+
+

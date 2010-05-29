@@ -1,5 +1,5 @@
 
-#include "rom.hpp"
+#include "rom.h"
 #include <nds.h>
 
 FILE* rom;

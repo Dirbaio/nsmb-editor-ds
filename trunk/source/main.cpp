@@ -6,12 +6,14 @@
 #include <string.h>
 #include <dirent.h>
 
-#include "rom.hpp"
-#include "tilesets.hpp"
-#include "level.hpp"
-#include "levelrendering.hpp"
-#include "ui.hpp"
-#include "control.hpp"
+#include "rom.h"
+#include "tilesets.h"
+#include "level.h"
+#include "levelrendering.h"
+#include "ui.h"
+#include "control.h"
+#include "oamUtil.h"
+
 #define mapxy(x, y) map[x+y*32]
 
 
@@ -28,7 +30,8 @@ int main(void)
 //	REG_POWERCNT = POWER_ALL_2D;
 	REG_DISPCNT = MODE_5_2D | DISPLAY_BG_EXT_PALETTE | DISPLAY_SCREEN_BASE(1);
 
-	vramSetBankA(VRAM_A_MAIN_BG);
+	vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
+	vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
 
 	if (fatInitDefault())
 	{
@@ -38,7 +41,7 @@ int main(void)
     	iprintf("Loading tilesets!\n");
 	}
 	uiShow();
-
+	loadOAM();
 	loadEditor(0);
 
 	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0x10, 0);
@@ -61,5 +64,6 @@ int main(void)
 	{
 		checkControls();
 		swiWaitForVBlank();
+		oamUpdate(&oamMain);
 	}
 }

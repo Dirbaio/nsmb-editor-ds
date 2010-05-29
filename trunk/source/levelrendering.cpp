@@ -1,4 +1,4 @@
-#include "levelrendering.hpp"
+#include "levelrendering.h"
 
 uint xMin, xMax, yMin, yMax;
 bool renderingSelected;
@@ -407,5 +407,10 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 
 void renderMinimap()
 {
+}
+
+void load()
+{
+	
 }
 
