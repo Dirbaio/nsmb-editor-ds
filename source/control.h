@@ -8,8 +8,8 @@
 #include <string.h>
 #include <dirent.h>
 
-#include "editor.hpp"
-#include "ui.hpp"
+#include "editor.h"
+#include "ui.h"
 
 using namespace std;
 
@@ -20,4 +20,4 @@ extern uint keysNowPressed;
 extern touchPosition touch;
 
 void checkControls();
-#endif
+#endif 

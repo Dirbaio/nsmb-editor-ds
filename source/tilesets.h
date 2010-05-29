@@ -25,7 +25,7 @@ struct objPointer
 
 #define overlayTileOffset 0x6000
 extern uint16 map16Data [TOTAL_MAP16][4];
-extern uint16 map16Overlays [256][4];
+extern const uint16 map16Overlays [256][4];
 extern objPointer *objectIndex[3];
 extern uint8 *objectDefinitions[3];
 

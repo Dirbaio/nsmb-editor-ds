@@ -1,4 +1,4 @@
-#include "level.hpp"
+#include "level.h"
 
 vector<LevelObject> objects;
 vector<LevelSprite> sprites;

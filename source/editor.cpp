@@ -1,4 +1,4 @@
-#include "editor.hpp"
+#include "editor.h"
 
 uint editMode = EDITMODE_OBJECTS;
 uint editAction = EDITACTION_SCROLL;
@@ -70,6 +70,8 @@ void doSelection(uint x, uint y)
 
 
 uint lastx, lasty;
+bool resizeLeft = false;
+bool resizeTop = false;
 
 void editorTouchDown(uint x, uint y)
 {
@@ -139,45 +141,7 @@ void editorTouchMoved(uint x, uint y)
 	repaintScreen();
 }
 
-void saveEditor() {}
-
-
-/*
-
-
-			if(levelx/16 != lastlx/16)
-			{
-				uint xMin, xMax;
-				if(levelx < lastlx)
-				{
-					xMin = levelx/16;
-					xMax = lastlx/16;
-				}
-				else
-				{
-					xMin = lastlx/16+16;
-					xMax = levelx/16+16;
-				}
-				
-				renderLevel(xMin, xMax, levely/16, levely/16+12);
-			}
-
-			if(levely/16 != lastly/16)
-			{
-				uint yMin, yMax;
-				if(levely < lastly)
-				{
-					yMin = levely/16;
-					yMax = lastly/16;
-				}
-				else
-				{
-					yMin = lastly/16+12;
-					yMax = levely/16+12;
-				}
-				
-				renderLevel(levelx/16, levelx/16+16, yMin, yMax);
-			}
-
-
-*/
+void saveEditor()
+{
+	
+}

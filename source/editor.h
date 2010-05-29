@@ -5,8 +5,8 @@
 #include <string.h>
 #include <dirent.h>
 
-#include "level.hpp"
-#include "levelrendering.hpp"
+#include "level.h"
+#include "levelrendering.h"
 
 using namespace std;
 

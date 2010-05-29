@@ -1,4 +1,4 @@
-#include "editor.hpp"
+#include "editor.h"
 #include <nds.h>
 
 using namespace std;
