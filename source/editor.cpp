@@ -141,6 +141,11 @@ void editorTouchMoved(uint x, uint y)
 	repaintScreen();
 }
 
+void editorRenderSprites()
+{
+	renderLevelSprites(levelx/16, levelx/16+16, levely/16, levely/16+12, levelx, levely);
+}
+
 void saveEditor()
 {
 	
