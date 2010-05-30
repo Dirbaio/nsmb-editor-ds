@@ -1,7 +1,26 @@
+/*
+*   This file is part of NSMB Editor DS
+*
+*   NSMB Editor DS is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   NSMB Editor DS is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with NSMB Editor DS.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include "level.h"
 
-vector<LevelObject> objects;
-vector<LevelSprite> sprites;
+List<LevelObject> objects;
+List<LevelSprite> sprites;
+
 bool *selectedObjects;
 uint selectedObjectsSize;
 
@@ -34,21 +53,22 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 	uint  fileSize = getFileSizeFromROM(bgdatFileIDp);
 	
 	uint objCount = fileSize / 10;
-	objects = vector<LevelObject>(objCount);
 	
 	uint i;
 	uint filePos = 0;
 	for (i = 0; i < objCount; i++)
 	{
-		objects[i].objNum = bgdatFile[filePos]     | (bgdatFile[filePos + 1] << 8);
-		objects[i].x =      bgdatFile[filePos + 2] | (bgdatFile[filePos + 3] << 8);
-		objects[i].y =      bgdatFile[filePos + 4] | (bgdatFile[filePos + 5] << 8);
-		objects[i].tx =     bgdatFile[filePos + 6] | (bgdatFile[filePos + 7] << 8);
-		objects[i].ty =     bgdatFile[filePos + 8] | (bgdatFile[filePos + 9] << 8);
+		LevelObject o;
+		o.objNum = bgdatFile[filePos]     | (bgdatFile[filePos + 1] << 8);
+		o.x =      bgdatFile[filePos + 2] | (bgdatFile[filePos + 3] << 8);
+		o.y =      bgdatFile[filePos + 4] | (bgdatFile[filePos + 5] << 8);
+		o.tx =     bgdatFile[filePos + 6] | (bgdatFile[filePos + 7] << 8);
+		o.ty =     bgdatFile[filePos + 8] | (bgdatFile[filePos + 9] << 8);
 
-		objects[i].tilesetNum = objects[i].objNum >> 12;
-		objects[i].objNum &= 0x0FFF;
-		objects[i].selected = false;
+		o.tilesetNum = objects[i].objNum >> 12;
+		o.objNum &= 0x0FFF;
+		o.selected = false;
+		objects.addItem(o);
 		filePos += 10;
 	}
 	
