@@ -1,6 +1,29 @@
+/*
+*   This file is part of NSMB Editor DS
+*
+*   NSMB Editor DS is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   NSMB Editor DS is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with NSMB Editor DS.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 
 #ifndef _LINKEDLIST_H
 #define _LINKEDLIST_H
+
+
+#ifndef NULL
+#define NULL 0
+#endif
 
 template <class T>
 class ListElem
@@ -9,7 +32,20 @@ class ListElem
 	
 	public:
 	T e;
-	ListElem(T& elem);
+	explicit ListElem(T& elem);
+};
+
+
+template <class T>
+class ListIterator
+{
+	ListElem<T> *curr;
+	public: 
+	ListIterator(ListElem<T> *n);
+	ListIterator operator++();
+	ListIterator operator--();
+	bool out() const;
+	bool in() const;
 };
 
 template <class T>
@@ -24,80 +60,11 @@ class List
 	void removeItem(ListElem<T>* elem);
 	ListElem<T>* firstElem() const;
 	ListElem<T>* lastElem() const;
+	ListIterator<T> begin() const;
+	ListIterator<T> end() const;
 	
 	void clear();
 };
 
-
-template <class T>
-ListElem<T>::ListElem(T& elem);
-{
-	e = elem;
-}
-
-template <class T>
-List<T>::List()
-{
-	first = null;
-	last = null;
-}
-
-template <class T>
-List<T>::~List()
-{
-	clear();
-}
-
-
-template <class T>
-void List<T>::addItem(T& item)
-{
-	last->next = new ListElem<T> (item);
-	last = last->next;
-}
-
-template <class T>
-void List<T>::removeItem(ListElem<T>* elem)
-{
-	if(elem->previous == NULL) //elem is the first one
-		first = elem->next;
-	else
-		elem->previous->next = elem->next;
-		
-	if(elem->next == NULL) //elem is the last one
-		last = elem->previous;
-	else
-		elem->next->previous = elem->previous;
-	
-	elem->previous = NULL;
-	elem->next = NULL;
-	
-	delete elem;
-}
-
-template <class T>
-ListElem<T>* List<T>::firstElem() const
-{
-	return first;
-}
-
-template <class T>
-ListElem<T>* List<T>::lastElem() const
-{
-	return last;
-}
-
-template <class T>
-void List<T>::clear()
-{
-	while(first != NULL)
-	{
-		ListElem<T> next = first->next;
-		delete first;
-		first = next;
-	}
-	
-	last = NULL;
-}
 
 #endif

@@ -1,3 +1,21 @@
+/*
+*   This file is part of NSMB Editor DS
+*
+*   NSMB Editor DS is free software: you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation, either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   NSMB Editor DS is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with NSMB Editor DS.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include "editor.h"
 
 uint editMode = EDITMODE_OBJECTS;
@@ -44,18 +62,18 @@ void repaintScreen()
 
 void unselectAll()
 {
-   	for(uint i = 0; i < objects.size(); i++)
-		objects[i].selected = false;
+	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
+		i->selected = false;
 }
 
 void doSelection(uint x, uint y)
 {
 	unselectAll();
 	uint selNum = 0xFFFFFFFF;
-	for(uint i = 0; i < objects.size(); i++)
+	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
 	{
-		if(objects[i].x <= x/16 && objects[i].x + objects[i].tx > x/16)
-		if(objects[i].y <= y/16 && objects[i].y + objects[i].ty > y/16)
+		if(i->x <= x/16 && i->x + i->tx > x/16)
+		if(i->y <= y/16 && i->y + i->ty > y/16)
 			selNum = i;
 	}
 	
@@ -125,11 +143,11 @@ void editorTouchMoved(uint x, uint y)
 		if(x == lastx && y == lasty)
 			return;
 			
-		for(uint i = 0; i < objects.size(); i++)
-			if(objects[i].selected)
+		for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
+			if(i->selected)
 			{
-				objects[i].x += x - lastx;
-				objects[i].y += y - lasty;
+				i->x += x - lastx;
+				i->y += y - lasty;
 			}
 			
 		lastx = x;
