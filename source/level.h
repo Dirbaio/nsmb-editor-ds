@@ -40,6 +40,9 @@ class LevelElement
 	int x, y;
 	int tx, ty;
 	bool selected;
+	
+	virtual int getSizeMultiplier();
+	virtual bool isResizable();
 };
 
 class LevelObject : public LevelElement
@@ -49,19 +52,18 @@ class LevelObject : public LevelElement
 	int tilesetNum;
 };
 
-struct blockPtr
-{
-	uint32 offs;
-	uint32 size;
-};
-
 class LevelSprite : public LevelElement
 {
-	byte spritedata;
+	public:
+	LevelSprite();
+	byte spriteData[6];
 	int spriteNum;
+	virtual bool isResizable();
 };
 
+
 extern List<LevelObject> objects;
+extern List<LevelSprite> sprites;
 
 extern uint levelFileID, bgdatFileID;
 

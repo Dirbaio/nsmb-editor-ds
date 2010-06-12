@@ -21,15 +21,10 @@
 List<LevelObject> objects;
 List<LevelSprite> sprites;
 
-bool *selectedObjects;
-uint selectedObjectsSize;
-
 uint levelFileID, bgdatFileID;
 
-uint8* levelFile;
-blockPtr* blockPointers;
-
 uint8 *levelBlocks[14];
+uint levelBlocksLen[14];
 
 bool loaded = false;
 
@@ -42,15 +37,10 @@ inline uint max(uint a, uint b)
 	return a>b?a:b;
 }
 
-void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
+void loadObjects()
 {
-	loaded = true;
-	
-	levelFileID = levelFileIDp;
-	bgdatFileID = bgdatFileIDp;
-	
-	uint8* bgdatFile = loadFileFromROM(bgdatFileIDp);
-	uint  fileSize = getFileSizeFromROM(bgdatFileIDp);
+	uint8* bgdatFile = loadFileFromROM(bgdatFileID);
+	uint  fileSize = getFileSizeFromROM(bgdatFileID);
 	
 	uint objCount = fileSize / 10;
 	
@@ -65,29 +55,125 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 		o.tx =     bgdatFile[filePos + 6] | (bgdatFile[filePos + 7] << 8);
 		o.ty =     bgdatFile[filePos + 8] | (bgdatFile[filePos + 9] << 8);
 
-		o.tilesetNum = objects[i].objNum >> 12;
+		o.tilesetNum = o.objNum >> 12;
 		o.objNum &= 0x0FFF;
 		o.selected = false;
 		objects.addItem(o);
 		filePos += 10;
 	}
 	
-	uint8* levelFile = loadFileFromROM(levelFileIDp);
-	blockPointers = (blockPtr*) levelFile;
+	free(bgdatFile);
+}
+
+
+struct blockPtr
+{
+	uint32 offs;
+	uint32 size;
+};
+
+void loadBlocks()
+{
+	uint8* levelFile = loadFileFromROM(levelFileID);
+	blockPtr* blockPointers = (blockPtr*) levelFile;
+		iprintf("blka");
+
 	for(int i = 0; i < 14; i++)
 	{
-		levelBlocks[i] = &levelFile[blockPointers[i].offs];
+		levelBlocksLen[i] = blockPointers[i].size;
+		if(levelBlocksLen[i] != 0)
+		{
+			levelBlocks[i] = new uint8[blockPointers[i].size];
+			dmaCopySafe(&levelFile[blockPointers[i].offs], levelBlocks[i], blockPointers[i].size);
+		}
+		else
+			levelBlocks[i] = NULL;
 	}
+	
+	delete[] levelFile;	iprintf("blkc");
+
+}
+
+void loadSprites()
+{
+	int filePos = 0;
+	uint8* block = levelBlocks[6];
+	uint16 spriteId = block[filePos] | block[filePos+1]<<8;
+	filePos += 2;
+	
+	while(spriteId != 0xFFFF)
+	{
+		iprintf("%x", spriteId);
+		LevelSprite s;
+		s.spriteNum = spriteId;
+		s.x = block[filePos] | block[filePos+1]<<8;
+		filePos += 2;
+		s.y = block[filePos] | block[filePos+1]<<8;
+		filePos += 2;
+		s.spriteData[0] = block[filePos++];
+		s.spriteData[1] = block[filePos++];
+		s.spriteData[2] = block[filePos++];
+		s.spriteData[3] = block[filePos++];
+		s.spriteData[4] = block[filePos++];
+		s.spriteData[5] = block[filePos++];
+		sprites.addItem(s);
+		
+		spriteId = block[filePos] | block[filePos+1]<<8;
+		filePos += 2;
+	}
+
+}
+
+void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
+{
+	loaded = true;
+	
+	levelFileID = levelFileIDp;
+	bgdatFileID = bgdatFileIDp;
+	
+	iprintf("obj");
+	loadObjects();
+	iprintf("blk");
+	loadBlocks();
+	iprintf("ts");
 	loadTilesets(levelBlocks[0][0xC]);
-	free(bgdatFile);
+	iprintf("spr");
+	loadSprites();
+	iprintf("ok");
 }
 
 void unloadLevel()
 {
 	if(!loaded) return;
 	
-	free(levelFile);
+	for(int i = 0; i < 14; i++)
+		delete[] levelBlocks[i];
+	
 	unloadTilesets();
 	
 	loaded = false;
+}
+
+
+
+//========================
+
+int LevelElement::getSizeMultiplier()
+{
+	return 16;
+}
+
+bool LevelElement::isResizable()
+{
+	return true;
+}
+
+bool LevelSprite::isResizable()
+{
+	return false;
+}
+LevelSprite::LevelSprite()
+{
+	tx = 1;
+	ty = 1;
 }

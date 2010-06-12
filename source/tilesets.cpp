@@ -612,12 +612,12 @@ void loadTilesets(int tileset)
 
 void unloadTilesets()
 {
-	free(objectIndex[0]);
-	free(objectIndex[1]);
-	free(objectIndex[2]);
-	free(objectDefinitions[0]);
-	free(objectDefinitions[1]);
-	free(objectDefinitions[2]);
+	delete[] objectIndex[0];
+	delete[] objectIndex[1];
+	delete[] objectIndex[2];
+	delete[] objectDefinitions[0];
+	delete[] objectDefinitions[1];
+	delete[] objectDefinitions[2];
 }
 
 void shadeExtPal(uint p)

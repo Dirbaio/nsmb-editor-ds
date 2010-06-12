@@ -35,13 +35,43 @@
 #define mapxy(x, y) map[x+y*32]
 
 
+void testLinkedLists()
+{
+	List<int> l;
+	
+	iprintf("FIRST %x last %x\n", l.first, l.last);
+	l.addItem(1);
+	iprintf("FIRST %x last %x\n", l.first, l.last);
+	l.addItem(6);
+	iprintf("FIRST %x last %x\n", l.first, l.last);
+	l.addItem(2);
+	iprintf("FIRST %x last %x\n", l.first, l.last);
+	l.addItem(9);
+	iprintf("FIRST %x last %x\n", l.first, l.last);
+	
+	iprintf("Elements:");
+	
+	for(ListIterator<int> i = l.begin(); i.in(); ++i)
+		iprintf("%d ", *i);
+	
+	iprintf("\n");
+	iprintf("Elements reverse:");
+	
+	for(ListIterator<int> i = l.end(); i.in(); --i)
+		iprintf("%d ", *i);
+	
+	iprintf("\n");
+
+}
 
 int main(void)  
 {
 	consoleDemoInit(); 
 	iprintf("NSMB Editor DS!\n");
 	iprintf("By Dirbaio\n\n");
-	iprintf("Compiled %s %s\n\n", __DATE__, __TIME__);
+	iprintf("Built %s %s\n\n", __DATE__, __TIME__);
+	
+	testLinkedLists();
 	
 	BG_PALETTE[0] = 0xEE0E;
 	
@@ -85,9 +115,9 @@ int main(void)
 		checkControls();
 		editorRenderSprites();
 		swiWaitForVBlank();
-		renderSprite(10, 10, SpriteSize_16x16, 0, 0);
-		renderSprite(30, 10, SpriteSize_16x16, 2, 2);
-		renderRect(5, 5, 24, 56);
+//		renderSprite(10, 10, SpriteSize_16x16, 0, 0);
+//		renderSprite(30, 10, SpriteSize_16x16, 2, 2);
+//		renderRect(5, 5, 24, 56);
 		oamFrame();
 	}
 }
