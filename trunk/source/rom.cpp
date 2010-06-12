@@ -52,7 +52,7 @@ uint8* decompressOverlay(uint8* sourcedata, uint sourcedataLength)
 	//uint last 4 bytes
 	DataVar2 = (uint)(sourcedata[sourcedataLength - 4] | (sourcedata[sourcedataLength - 3] << 8) | (sourcedata[sourcedataLength - 2] << 16) | (sourcedata[sourcedataLength - 1] << 24));
 
-	uint8* memory = (uint8*) malloc(sourcedataLength + DataVar2);
+	uint8* memory = new uint8[sourcedataLength + DataVar2];
 	dmaCopySafe(sourcedata, memory, sourcedataLength);
 	
 	uint r0, r1, r2, r3, r5, r6, r7, r12;
@@ -126,7 +126,7 @@ void loadROM()
 
 void closeROM()
 {
-	free(overlay0);
+	delete[] overlay0;
 	fclose(rom);
 }
 
@@ -137,9 +137,9 @@ void loadHeader()
 	loadDataInto(0, sizeof(romHeader), &romHeader);
 }
 
-uint8_t* loadData(uint offs, uint size)
+uint8* loadData(uint offs, uint size)
 {
-	uint8_t* buffer = (uint8_t*)malloc(size);
+	uint8* buffer = new uint8[size];
 	fseek(rom, offs, SEEK_SET);
 	fread(buffer, size, sizeof(uint8_t), rom);
 	return buffer;
@@ -153,16 +153,17 @@ void loadDataInto(uint offs, uint size, void* dest)
 
 void loadCompressedData(uint offs, uint size, void* dest)
 {
-	uint8_t* ptr = loadData(offs, size);
+	uint8* ptr = loadData(offs, size);
+	
 	uint32 decsize = ptr[1] | ptr[2]<<8 | ptr[3]<<16;
-	uint8_t* buffer = (uint8_t*)malloc(decsize);
+	uint8* buffer = new uint8[decsize];
 	decompress(ptr, buffer, LZ77);
 	dmaCopySafe(buffer, dest, decsize);
-	free(ptr);
-	free(buffer);
+	delete[] ptr;
+	delete[] buffer;
 }
 
-uint8_t* loadFileFromROM(uint fileID)
+uint8* loadFileFromROM(uint fileID)
 {
 	fseek(rom, romHeader.fatOffset+fileID*8, SEEK_SET);
 	uint32 offs = readUInt(rom);

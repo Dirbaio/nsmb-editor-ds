@@ -24,7 +24,7 @@ bool renderingSelected;
 uint16 *bg2ptr;
 uint16 *bg3ptr;
 
-bool onScreen(LevelObject& obj)
+bool onScreen(LevelElement& obj)
 {
 	if(obj.x > xMax) return false;
 	if(obj.y > yMax) return false;
@@ -81,8 +81,6 @@ inline void setMap16TileXY(uint x, uint y, uint16 tile)
 		setTileXYb(x*2,   y*2+1, 0);
 		setTileXYb(x*2+1, y*2+1, 0);
 	}
-
-	
 }
 
 uint16 readTile(uint8* obj, uint& pos, uint8& controlByte)
@@ -402,12 +400,12 @@ void renderLevelSprites(uint xMins, uint xMaxs, uint yMins, uint yMaxs, uint xCa
 	xMax = xMaxs;
 	yMax = yMaxs;
 	
-	for(uint i = 0; i < objects.size(); i++)
+	for(ListIterator<LevelObject> i = objects.end(); i.in(); --i)
 	{
-		if(onScreen(objects[i]))
+		if(onScreen(*i))
 		{
-			renderRect((objects[i].x-xCam)*16, (objects[i].y-yCam)*16, 
-				objects[i].tx*16, objects[i].ty*16);
+			renderRect((i->x-xCam)*16, (i->y-yCam)*16, 
+				i->tx*16, i->ty*16);
 		}
 	}
 }
@@ -453,6 +451,27 @@ void renderTileRect(int xx, int yy, int tx, int ty, int linetile)
 	}
 }
 
+void renderSprites()
+{
+	for(ListIterator<LevelSprite> i = sprites.begin(); i.in(); ++i)
+	{
+		if(!onScreen(*i)) continue;
+		
+		renderingSelected = i->selected;
+		
+		setTileXY(i->x*2,   i->y*2,   0x3D4 | 1<<14);
+		setTileXY(i->x*2+1, i->y*2,   0x3D5 | 1<<14);
+		setTileXY(i->x*2,   i->y*2+1, 0x3D6 | 1<<14);
+		setTileXY(i->x*2+1, i->y*2+1, 0x3D7 | 1<<14);
+		
+		int sprNum = i->spriteNum;
+		setTileXYb(i->x*2,   i->y*2,   0x3DC + sprNum / 1000 % 10);
+		setTileXYb(i->x*2+1, i->y*2,   0x3DC + sprNum / 100 % 10);
+		setTileXYb(i->x*2,   i->y*2+1, 0x3DC + sprNum / 10 % 10);
+		setTileXYb(i->x*2+1, i->y*2+1, 0x3DC + sprNum / 1 % 10);
+	}
+}
+
 void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 {
 	bg2ptr = (uint16*)0x06018000;
@@ -479,29 +498,31 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 		setMap16TileXY(x, y, x+y*16);
 	*/
 	
-	for(uint i = 0; i < objects.size(); i++)
+	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
 	{
-		if(onScreen(objects[i]))
+		if(onScreen(*i))
 		{
-			renderingSelected = objects[i].selected;
-			renderObject(objects[i].objNum, objects[i].tilesetNum, 
-				objects[i].x, objects[i].y, 
-				objects[i].tx, objects[i].ty);
+			renderingSelected = i->selected;
+			renderObject(i->objNum, i->tilesetNum, 
+				i->x, i->y, 
+				i->tx, i->ty);
 		}
 	}
 	
 	renderingSelected = false;
 	
-	for(uint i = 0; i < objects.size(); i++)
+	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
 	{
-		if(onScreen(objects[i]))
+		if(onScreen(*i))
 		{
-			if(objects[i].selected)
-				renderTileRect(objects[i].x, objects[i].y,
-					objects[i].tx, objects[i].ty, 0x3e9);
+			if(i->selected)
+				renderTileRect(i->x, i->y,
+					i->tx, i->ty, 0x3e9);
 			
 		}
 	}
+	
+	renderSprites();
 }
 
 

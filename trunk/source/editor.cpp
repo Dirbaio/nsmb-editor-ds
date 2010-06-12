@@ -23,8 +23,18 @@ uint editAction = EDITACTION_SCROLL;
 
 int levelx = 0;
 int levely = 0;
-int lastlx = 0;
-int lastly = 0;
+
+bool multiSelecting = false;
+int multiSelectX, multiSelectY;
+int multiSelectXb, multiSelectYb;
+
+
+uint tx, ty; //Position touched now, relative to level
+uint ltx, lty; //Position touched on last frame.
+uint lax, lay; //Last position relative to screen
+
+bool resizeLeft = false;
+bool resizeTop = false;
 
 
 uint calcLevelFileID(uint levNum)
@@ -45,8 +55,6 @@ void loadEditor(uint lev)
 	
 	levelx = 0;
 	levely = 0;
-	lastlx = 0;
-	lastly = 0;
 	
 	bgSetScroll(2, levelx%512, levely%512);
 	bgSetScroll(3, levelx%512, levely%512);
@@ -64,98 +72,160 @@ void unselectAll()
 {
 	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
 		i->selected = false;
+	for(ListIterator<LevelSprite> i = sprites.begin(); i.in(); ++i)
+		i->selected = false;
+}
+bool elementInMultiRect(LevelElement& obj)
+{
+	int xMin = multiSelectX < multiSelectXb ? multiSelectX : multiSelectXb;
+	int xMax = multiSelectX > multiSelectXb ? multiSelectX : multiSelectXb;
+	int yMin = multiSelectY < multiSelectYb ? multiSelectY : multiSelectYb;
+	int yMax = multiSelectY > multiSelectYb ? multiSelectY : multiSelectYb;
+	int mult = 16 / obj.getSizeMultiplier();
+	
+	if(obj.x > xMax*mult) return false;
+	if(obj.y > yMax*mult) return false;
+	if(obj.x + obj.tx < xMin*mult) return false;
+	if(obj.y + obj.ty < yMin*mult) return false;
+	return true;
+}
+
+bool elementAtPos(LevelElement& e, int x, int y)
+{
+	int sizeMult = e.getSizeMultiplier();
+	if(e.x <= x/sizeMult && e.x + e.tx > x/sizeMult)
+	if(e.y <= y/sizeMult && e.y + e.ty > y/sizeMult)
+		return true;
+		
+	return false;
+}
+
+LevelElement* getElementAtPos(int x, int y)
+{
+	for(ListIterator<LevelSprite> i = sprites.end(); i.in(); --i)
+		if(elementAtPos(*i, x, y))
+			return &(*i);
+
+	for(ListIterator<LevelObject> i = objects.end(); i.in(); --i)
+		if(elementAtPos(*i, x, y))
+			return &(*i);
+	
+	return NULL;
 }
 
 void doSelection(uint x, uint y)
 {
-	unselectAll();
-	uint selNum = 0xFFFFFFFF;
-	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
-	{
-		if(i->x <= x/16 && i->x + i->tx > x/16)
-		if(i->y <= y/16 && i->y + i->ty > y/16)
-			selNum = i;
-	}
+	LevelElement* elemAtCursor = getElementAtPos(x, y);
+	multiSelecting = false;
 	
-	if(selNum == 0xFFFFFFFF)
+	if(elemAtCursor != NULL)
+		if(elemAtCursor->selected)
+			return;
+	
+	unselectAll();
+	
+	if(elemAtCursor == NULL)
 	{
+		multiSelecting = true;
+		multiSelectX = x / 16;
+		multiSelectY = y / 16;
+		multiSelectXb = x / 16;
+		multiSelectYb = y / 16;
 	}
 	else
 	{
-		objects[selNum].selected = true;
+		elemAtCursor->selected = true;
 	}
 }
-
-
-uint lastx, lasty;
-bool resizeLeft = false;
-bool resizeTop = false;
 
 void editorTouchDown(uint x, uint y)
 {
-	touchx = x;
-	touchy = y;
-	
+	tx = x+levelx;
+	ty = y+levely;
+
 	if(editAction != EDITACTION_SCROLL)
 	{
-		doSelection(x + levelx, y + levely);
+		doSelection(tx, ty);
 		repaintScreen();
 	}
-	lastx = x;
-	lasty = y;
-	if(editMode == EDITMODE_OBJECTS)
+	
+	ltx = tx;
+	lty = ty;
+	lax = x;
+	lay = y;
+}
+
+void doMultiSelection()
+{
+	unselectAll();
+	for(ListIterator<LevelSprite> i = sprites.end(); i.in(); --i)
+		if(elementInMultiRect(*i))
+			i->selected = true;
+
+	for(ListIterator<LevelObject> i = objects.end(); i.in(); --i)
+		if(elementInMultiRect(*i))
+			i->selected = true;
+}
+
+void doAction(LevelElement& e)
+{
+	if(!e.selected) return;
+	
+	int mult = e.getSizeMultiplier();
+	int dx = tx / mult;
+	dx -= ltx / mult;
+	int dy = ty / mult;
+	dy -= lty / mult;
+	
+	if(editAction == EDITACTION_MOVE)
 	{
-		lastx /= 16;
-		lasty /= 16;
+		if(e.x + dx < 0) e.x = 0;
+		else e.x += dx;
+		
+		if(e.y + dy < 0) e.y = 0;
+		else e.y += dy;
 	}
 }
 
-
 void editorTouchMoved(uint x, uint y)
 {
+	tx = x+levelx;
+	ty = y+levely;
+	
 	if(editAction == EDITACTION_SCROLL)
 	{
 		
-		levelx -= x - touchx;
-		levely -= y - touchy;
+		levelx += lax;
+		levelx -= x;
+		levely += lay;
+		levely -= y;
 
 		if(levelx<0) levelx = 0;
 		if(levely<0) levely = 0;
-
-		lastlx = levelx;
-		lastly = levely;
 
 		bgSetScroll(2, levelx%512, levely%512);
 		bgSetScroll(3, levelx%512, levely%512);
 
 		bgUpdate();
-		touchx = x;
-		touchy = y;
+	}
+	else if(multiSelecting)
+	{
+		multiSelectXb = tx/16;
+		multiSelectYb = ty/16;
+		doMultiSelection();
 	}
 	else
 	{
-		
-		if(editMode == EDITMODE_OBJECTS)
-		{
-			x /= 16;
-			y /= 16;
-		}
-		if(x == lastx && y == lasty)
-			return;
-			
 		for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
-			if(i->selected)
-			{
-				i->x += x - lastx;
-				i->y += y - lasty;
-			}
-			
-		lastx = x;
-		lasty = y;
-		
+			doAction(*i);
+		for(ListIterator<LevelSprite> i = sprites.begin(); i.in(); ++i)
+			doAction(*i);
 	}
 	
-	
+	ltx = tx;
+	lty = ty;	
+	lax = x;
+	lay = y;
 	repaintScreen();
 }
 
