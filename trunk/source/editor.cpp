@@ -49,16 +49,17 @@ uint calcLevelFileID(uint levNum)
 void loadEditor(uint lev)
 {
 	unloadLevel();
-	iprintf("Level %d\n", lev);
+	iprintf("Loading Editor. Level %d\n", lev);
 	int fid = calcLevelFileID(lev);
 	loadLevel(fid, fid+1);
-	
+	iprintf("Level loaded. ");
 	levelx = 0;
 	levely = 0;
 	
 	bgSetScroll(2, levelx%512, levely%512);
 	bgSetScroll(3, levelx%512, levely%512);
 	renderLevel(levelx/16, levelx/16+16, levely/16, levely/16+12);
+	iprintf("Level Rendered.\n");
 }
 
 uint touchx, touchy;
@@ -70,9 +71,9 @@ void repaintScreen()
 
 void unselectAll()
 {
-	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
+	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
 		i->selected = false;
-	for(ListIterator<LevelSprite> i = sprites.begin(); i.in(); ++i)
+	for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); ++i)
 		i->selected = false;
 }
 bool elementInMultiRect(LevelElement& obj)
@@ -102,11 +103,11 @@ bool elementAtPos(LevelElement& e, int x, int y)
 
 LevelElement* getElementAtPos(int x, int y)
 {
-	for(ListIterator<LevelSprite> i = sprites.end(); i.in(); --i)
+	for(list<LevelSprite>::reverse_iterator i = sprites.rbegin(); i!=sprites.rend(); ++i)
 		if(elementAtPos(*i, x, y))
 			return &(*i);
 
-	for(ListIterator<LevelObject> i = objects.end(); i.in(); --i)
+	for(list<LevelObject>::reverse_iterator i = objects.rbegin(); i!=objects.rend(); ++i)
 		if(elementAtPos(*i, x, y))
 			return &(*i);
 	
@@ -158,11 +159,11 @@ void editorTouchDown(uint x, uint y)
 void doMultiSelection()
 {
 	unselectAll();
-	for(ListIterator<LevelSprite> i = sprites.end(); i.in(); --i)
+	for(list<LevelSprite>::reverse_iterator i = sprites.rbegin(); i!=sprites.rend(); ++i)
 		if(elementInMultiRect(*i))
 			i->selected = true;
 
-	for(ListIterator<LevelObject> i = objects.end(); i.in(); --i)
+	for(list<LevelObject>::reverse_iterator i = objects.rbegin(); i!=objects.rend(); ++i)
 		if(elementInMultiRect(*i))
 			i->selected = true;
 }
@@ -216,9 +217,9 @@ void editorTouchMoved(uint x, uint y)
 	}
 	else
 	{
-		for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
+		for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
 			doAction(*i);
-		for(ListIterator<LevelSprite> i = sprites.begin(); i.in(); ++i)
+		for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); ++i)
 			doAction(*i);
 	}
 	

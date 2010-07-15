@@ -22,7 +22,6 @@
 
 void loadOAM()
 {
-	iprintf("INITOAM");
 	//initialize the sub sprite engine with 1D mapping 128 byte boundary
 	//and no external palette support
 	oamInit(&oamMain, SpriteMapping_2D , true);

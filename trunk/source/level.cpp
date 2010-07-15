@@ -18,8 +18,8 @@
 
 #include "level.h"
 
-List<LevelObject> objects;
-List<LevelSprite> sprites;
+list<LevelObject> objects;
+list<LevelSprite> sprites;
 
 uint levelFileID, bgdatFileID;
 
@@ -58,7 +58,7 @@ void loadObjects()
 		o.tilesetNum = o.objNum >> 12;
 		o.objNum &= 0x0FFF;
 		o.selected = false;
-		objects.addItem(o);
+		objects.push_back(o);
 		filePos += 10;
 	}
 	
@@ -76,7 +76,6 @@ void loadBlocks()
 {
 	uint8* levelFile = loadFileFromROM(levelFileID);
 	blockPtr* blockPointers = (blockPtr*) levelFile;
-		iprintf("blka");
 
 	for(int i = 0; i < 14; i++)
 	{
@@ -90,7 +89,7 @@ void loadBlocks()
 			levelBlocks[i] = NULL;
 	}
 	
-	delete[] levelFile;	iprintf("blkc");
+	delete[] levelFile;
 
 }
 
@@ -103,8 +102,8 @@ void loadSprites()
 	
 	while(spriteId != 0xFFFF)
 	{
-		iprintf("%x", spriteId);
 		LevelSprite s;
+        s.selected = false;
 		s.spriteNum = spriteId;
 		s.x = block[filePos] | block[filePos+1]<<8;
 		filePos += 2;
@@ -116,7 +115,7 @@ void loadSprites()
 		s.spriteData[3] = block[filePos++];
 		s.spriteData[4] = block[filePos++];
 		s.spriteData[5] = block[filePos++];
-		sprites.addItem(s);
+		sprites.push_back(s);
 		
 		spriteId = block[filePos] | block[filePos+1]<<8;
 		filePos += 2;
@@ -131,15 +130,12 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
 	levelFileID = levelFileIDp;
 	bgdatFileID = bgdatFileIDp;
 	
-	iprintf("obj");
+    objects = list<LevelObject>();
+    sprites = list<LevelSprite>();
 	loadObjects();
-	iprintf("blk");
 	loadBlocks();
-	iprintf("ts");
 	loadTilesets(levelBlocks[0][0xC]);
-	iprintf("spr");
 	loadSprites();
-	iprintf("ok");
 }
 
 void unloadLevel()

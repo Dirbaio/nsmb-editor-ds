@@ -16,11 +16,9 @@
 */
 
 
-#include <vector>
+#include<list>
 #include "rom.h"
 #include "tilesets.h"
-#include "linkedlist.h"
-
 
 #define MSCREEN_WIDTH 64
 #define MSCREEN_HEIGHT 64
@@ -62,8 +60,8 @@ class LevelSprite : public LevelElement
 };
 
 
-extern List<LevelObject> objects;
-extern List<LevelSprite> sprites;
+extern list<LevelObject> objects;
+extern list<LevelSprite> sprites;
 
 extern uint levelFileID, bgdatFileID;
 
