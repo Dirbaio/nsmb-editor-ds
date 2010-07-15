@@ -65,7 +65,6 @@ void renderButton(int pos, int btn, bool sel)
 void renderUI()
 {
 	bg1ptr=  (uint16*)0x0601C000;
-	iprintf("%x", bg1ptr);
 	for(int x = 0; x < 16; x++)
 		renderButton(x, BTN_EMPTY, false);
 	

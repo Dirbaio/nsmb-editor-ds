@@ -113,15 +113,20 @@ a9B8:
 
 void loadROM()
 {
-	iprintf(".");
+	iprintf("Opening file\n");
 	rom = fopen("nsmb.nds", "rb");
-	iprintf(".");
+    if(rom == NULL)
+    {
+        iprintf("ERROR: Romfile = null. Halting!\n");
+        exit(1);
+    }
+    iprintf("Reading Header\n");
 	loadHeader();
-	iprintf(".");
+    iprintf("Reading Overlay 0\n");
 	uint8* ov = loadFileFromROM(0);
-	iprintf(".");
+    iprintf("Decompressing ov0\n");
 	overlay0 = decompressOverlay(ov, getFileSizeFromROM(0));
-	iprintf(".");
+    iprintf("Done loading rom!\n");
 }
 
 void closeROM()
@@ -168,7 +173,6 @@ uint8* loadFileFromROM(uint fileID)
 	fseek(rom, romHeader.fatOffset+fileID*8, SEEK_SET);
 	uint32 offs = readUInt(rom);
 	uint32 end =  readUInt(rom);
-	iprintf(".");
 	return loadData(offs, end-offs);
 }
 
@@ -177,7 +181,6 @@ void loadFileFromROMInto(uint fileID, void* dest)
 	fseek(rom, romHeader.fatOffset+fileID*8, SEEK_SET);
 	uint32 offs = readUInt(rom);
 	uint32 end =  readUInt(rom);
-	iprintf(".");
 	loadDataInto(offs, end-offs, dest);
 }
 
@@ -195,7 +198,6 @@ void loadCompressedFileFromROM(uint fileID, void* dest)
 	fseek(rom, romHeader.fatOffset+fileID*8, SEEK_SET);
 	int offs = readUInt(rom);
 	int end =  readUInt(rom);
-	iprintf(".");
 	loadCompressedData(offs, end-offs, dest);
 }
 

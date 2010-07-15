@@ -24,7 +24,7 @@ bool renderingSelected;
 uint16 *bg2ptr;
 uint16 *bg3ptr;
 
-bool onScreen(LevelElement& obj)
+bool onScreen(const LevelElement& obj)
 {
 	if(obj.x > xMax) return false;
 	if(obj.y > yMax) return false;
@@ -385,9 +385,17 @@ void renderObject(uint objNum, uint tilesetNum, uint xp, uint yp, uint w, uint h
 //	iprintf("obj %d %d: %d %d, %d %d\n", tilesetNum, objNum, xp, yp, w, h);
 	uint8* obj = objectDefinitions[tilesetNum] + objectIndex[tilesetNum][objNum].offs;
 	if(obj[0] & 0x80)
+    {
+        iprintf("m");
 		renderSlopeObject(obj, xp, yp, w, h);
+        iprintf("n");
+    }
 	else
+    {
+        iprintf("o");
 		renderStdObject(obj, xp, yp, w, h);
+        iprintf("p");
+    }
 }
 
 
@@ -400,7 +408,7 @@ void renderLevelSprites(uint xMins, uint xMaxs, uint yMins, uint yMaxs, uint xCa
 	xMax = xMaxs;
 	yMax = yMaxs;
 	
-	for(ListIterator<LevelObject> i = objects.end(); i.in(); --i)
+	for(list<LevelObject>::reverse_iterator i = objects.rbegin(); i != objects.rend(); ++i)
 	{
 		if(onScreen(*i))
 		{
@@ -453,7 +461,8 @@ void renderTileRect(int xx, int yy, int tx, int ty, int linetile)
 
 void renderSprites()
 {
-	for(ListIterator<LevelSprite> i = sprites.begin(); i.in(); ++i)
+    iprintf("f");
+	for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); ++i)
 	{
 		if(!onScreen(*i)) continue;
 		
@@ -470,6 +479,7 @@ void renderSprites()
 		setTileXYb(i->x*2,   i->y*2+1, 0x3DC + sprNum / 10 % 10);
 		setTileXYb(i->x*2+1, i->y*2+1, 0x3DC + sprNum / 1 % 10);
 	}
+    iprintf("g");
 }
 
 void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
@@ -487,6 +497,7 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 	xMax = xMaxs;
 	yMax = yMaxs;
 		
+    iprintf("a");
 	//Zero out the zone we're going to redraw...
 	for(uint x = xMin; x <= xMax; x++)
 		for(uint y = yMin; y <= yMax; y++)
@@ -498,20 +509,26 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 		setMap16TileXY(x, y, x+y*16);
 	*/
 	
-	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
+    iprintf("b");
+    iprintf(" %s ", objects.size());
+	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
 	{
+        iprintf("h");
 		if(onScreen(*i))
 		{
+            iprintf("i");
 			renderingSelected = i->selected;
 			renderObject(i->objNum, i->tilesetNum, 
 				i->x, i->y, 
 				i->tx, i->ty);
+            iprintf("j");
 		}
 	}
+    iprintf("c");
 	
 	renderingSelected = false;
 	
-	for(ListIterator<LevelObject> i = objects.begin(); i.in(); ++i)
+	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
 	{
 		if(onScreen(*i))
 		{
@@ -521,8 +538,10 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 			
 		}
 	}
+    iprintf("d");
 	
 	renderSprites();
+    iprintf("e");
 }
 
 

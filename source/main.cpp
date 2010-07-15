@@ -34,44 +34,17 @@
 
 #define mapxy(x, y) map[x+y*32]
 
-
-void testLinkedLists()
-{
-	List<int> l;
-	
-	iprintf("FIRST %x last %x\n", l.first, l.last);
-	l.addItem(1);
-	iprintf("FIRST %x last %x\n", l.first, l.last);
-	l.addItem(6);
-	iprintf("FIRST %x last %x\n", l.first, l.last);
-	l.addItem(2);
-	iprintf("FIRST %x last %x\n", l.first, l.last);
-	l.addItem(9);
-	iprintf("FIRST %x last %x\n", l.first, l.last);
-	
-	iprintf("Elements:");
-	
-	for(ListIterator<int> i = l.begin(); i.in(); ++i)
-		iprintf("%d ", *i);
-	
-	iprintf("\n");
-	iprintf("Elements reverse:");
-	
-	for(ListIterator<int> i = l.end(); i.in(); --i)
-		iprintf("%d ", *i);
-	
-	iprintf("\n");
-
-}
-
 int main(void)  
 {
+	// install the default exception handler
+	defaultExceptionHandler();
+
 	consoleDemoInit(); 
 	iprintf("NSMB Editor DS!\n");
 	iprintf("By Dirbaio\n\n");
 	iprintf("Built %s %s\n\n", __DATE__, __TIME__);
 	
-	testLinkedLists();
+//	testLinkedLists();
 	
 	BG_PALETTE[0] = 0xEE0E;
 	
@@ -83,15 +56,19 @@ int main(void)
 	vramSetBankD(VRAM_D_MAIN_BG_0x06000000);
 	vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
 
-	if (fatInitDefault())
+	if (!fatInitDefault())
 	{
-		iprintf("Loading Rom!\n");
-		loadROM();
-		
-    	iprintf("Loading tilesets!\n");
+        iprintf("Error loading FAT. Halting.");
+        return 1;
 	}
+
+    iprintf("Loading Rom!\n");
+    loadROM();
+		
 	uiShow();
+    iprintf("Loading OAM!\n");
 	loadOAM();
+    iprintf("Loading Editor!\n");
 	loadEditor(0);
 
 	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0x10, 0);
@@ -110,6 +87,8 @@ int main(void)
 	int lastx = 0;
 	int lasty = 0;
 
+    
+	iprintf("Going to main loop!\n");
 	while(1)
 	{
 		checkControls();
