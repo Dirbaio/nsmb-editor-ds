@@ -19,6 +19,7 @@
 #include "tilesets.h"
 #include "rom.h"
 #include "tilegfx.h"
+#include "level.h"
 
 uint16 map16Data [TOTAL_MAP16][4];
 
@@ -566,8 +567,10 @@ void createOverrides()
 void loadTilesets(int tileset)
 {
 
+    void* bg2Ptr = bgGetGfxPtr(2);
 	//Load graphics
-	loadCompressedFileFromROM(jyoytu_ncg_fileID[region], bgGetGfxPtr(2));
+    
+	loadCompressedFileFromROM(jyoytu_ncg_fileID[region], bg2Ptr );
 	loadCompressedFileFromROM(
 		getFileIDFromTable(Table_TS_NCG, tileset),
 		bgGetGfxPtr(2)+0x1800

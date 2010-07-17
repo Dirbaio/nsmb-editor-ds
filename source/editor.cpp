@@ -59,7 +59,6 @@ void loadEditor(uint lev)
 	bgSetScroll(2, levelx%512, levely%512);
 	bgSetScroll(3, levelx%512, levely%512);
 	renderLevel(levelx/16, levelx/16+16, levely/16, levely/16+12);
-	iprintf("Level Rendered.\n");
 }
 
 uint touchx, touchy;

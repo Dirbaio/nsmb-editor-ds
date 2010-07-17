@@ -484,6 +484,7 @@ void renderSprites()
 
 void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 {
+    iprintf(" %d ", objects.size());
 	bg2ptr = (uint16*)0x06018000;
 	bg3ptr = (uint16*)0x0601A000;
 	
@@ -510,7 +511,7 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 	*/
 	
     iprintf("b");
-    iprintf(" %s ", objects.size());
+    iprintf(" %d ", objects.size());
 	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
 	{
         iprintf("h");

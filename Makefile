@@ -30,14 +30,14 @@ GAME_SUBTITLE2 :=	jul.rustedlogic.net
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-mthumb -mthumb-interwork
+ARCH	:=	-marm -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -O2\
+CFLAGS	:=	-g -Wall -O0\
  		-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 		-ffast-math \
 		$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM9
+CFLAGS	+=	$(INCLUDE) -DARM9 -DDEBUG
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
@@ -134,7 +134,6 @@ else
 $(OUTPUT).nds	: 	$(OUTPUT).elf
 	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1);$(GAME_SUBTITLE2)" $(_ADDFILES)
 	@echo built ... $(notdir $@)
-	@dlditool "mpcf.dldi" "$(OUTPUT).nds"
 	
 $(OUTPUT).elf	:	$(OFILES)
  
