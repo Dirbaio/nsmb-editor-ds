@@ -5,7 +5,7 @@
 *   it under the terms of the GNU General Public License as published by
 *   the Free Software Foundation, either version 3 of the License, or
 *   (at your option) any later version.
-*
+*  
 *   NSMB Editor DS is distributed in the hope that it will be useful,
 *   but WITHOUT ANY WARRANTY; without even the implied warranty of
 *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,6 +23,7 @@ list<LevelSprite> sprites;
 
 uint levelFileID, bgdatFileID;
 
+uint8* levelFile;
 uint8 *levelBlocks[14];
 uint levelBlocksLen[14];
 
@@ -62,7 +63,7 @@ void loadObjects()
 		filePos += 10;
 	}
 	
-	free(bgdatFile);
+	delete[] bgdatFile;
 }
 
 
@@ -74,22 +75,16 @@ struct blockPtr
 
 void loadBlocks()
 {
-	uint8* levelFile = loadFileFromROM(levelFileID);
-	blockPtr* blockPointers = (blockPtr*) levelFile;
-
+	levelFile = loadFileFromROM(levelFileID);
+    u32* levelFile32 = (u32*) levelFile;
+    
 	for(int i = 0; i < 14; i++)
 	{
-		levelBlocksLen[i] = blockPointers[i].size;
-		if(levelBlocksLen[i] != 0)
-		{
-			levelBlocks[i] = new uint8[blockPointers[i].size];
-			dmaCopySafe(&levelFile[blockPointers[i].offs], levelBlocks[i], blockPointers[i].size);
-		}
-		else
-			levelBlocks[i] = NULL;
+		levelBlocksLen[i] = levelFile32[i*2+1];
+		levelBlocks[i] = levelFile + levelFile32[i*2];
+        iprintf("%d -> %x %x\n", i, levelBlocksLen[i], levelBlocks[i]);
 	}
 	
-	delete[] levelFile;
 
 }
 
@@ -134,8 +129,11 @@ void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
     sprites = list<LevelSprite>();
 	loadObjects();
 	loadBlocks();
-	loadTilesets(levelBlocks[0][0xC]);
+    
+    u8 tilnum = levelBlocks[0][0xC];
+    iprintf("Tileset Number: %d\n", tilnum);
 	loadSprites();
+	loadTilesets(tilnum);
 }
 
 void unloadLevel()

@@ -19,7 +19,7 @@
 
 #include "rom.h"
 #include <nds.h>
-
+#include "level.h"
 FILE* rom;
 sNDSHeader romHeader;
 uint8 *overlay0;
@@ -144,16 +144,21 @@ void loadHeader()
 
 uint8* loadData(uint offs, uint size)
 {
+    iprintf(" %d ", objects.size());
 	uint8* buffer = new uint8[size];
+    iprintf(" %x %x -> %x", offs, size, buffer);
+    iprintf(" %d ", objects.size());
 	fseek(rom, offs, SEEK_SET);
-	fread(buffer, size, sizeof(uint8_t), rom);
+    iprintf(" %d ", objects.size());
+	fread(buffer, sizeof(uint8), size, rom);
+    iprintf(" %d ", objects.size());
 	return buffer;
 }
 
 void loadDataInto(uint offs, uint size, void* dest)
 {
 	fseek(rom, offs, SEEK_SET);
-	fread(dest, size, sizeof(uint8_t), rom);
+	fread(dest, sizeof(uint8), size, rom);
 }
 
 void loadCompressedData(uint offs, uint size, void* dest)
@@ -227,11 +232,8 @@ bool dmaCopySafe(const void *src, void *dst, u32 size)
     if((srca>>24)==0x02)                // Write cache back to memory.
         DC_FlushRange(src, size);
 
-    if((srca|dsta|size) & 3)
-        dmaCopyHalfWords(3, src, dst, size);
-    else
-        dmaCopyWords(3, src, dst, size);
-
+    memcpy(dst, src, size);
+    
     if((dsta>>24)==0x02)                // Set cache of dst range to 'dirty'
         DC_InvalidateRange(dst, size);
 

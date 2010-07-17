@@ -37,7 +37,7 @@
 int main(void)  
 {
 	// install the default exception handler
-	defaultExceptionHandler();
+ 	defaultExceptionHandler();
 
 	consoleDemoInit(); 
 	iprintf("NSMB Editor DS!\n");
