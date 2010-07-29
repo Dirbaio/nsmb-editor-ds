@@ -21,7 +21,8 @@
 list<LevelObject> objects;
 list<LevelSprite> sprites;
 
-uint levelFileID, bgdatFileID;
+string levelFilePrefix;
+
 
 uint8* levelFile;
 uint8 *levelBlocks[14];
@@ -40,8 +41,9 @@ inline uint max(uint a, uint b)
 
 void loadObjects()
 {
-	uint8* bgdatFile = loadFileFromROM(bgdatFileID);
-	uint  fileSize = getFileSizeFromROM(bgdatFileID);
+    NitroFile* bgdatFilePtr = fs->getFileByName(levelFilePrefix+"_bgdat.bin");
+	uint8* bgdatFile = bgdatFilePtr->getContents();
+	uint  fileSize = bgdatFilePtr->size;
 	
 	uint objCount = fileSize / 10;
 	
@@ -75,14 +77,14 @@ struct blockPtr
 
 void loadBlocks()
 {
-	levelFile = loadFileFromROM(levelFileID);
+    NitroFile* levFil = fs->getFileByName(levelFilePrefix+".bin");
+	levelFile = levFil->getContents();
     u32* levelFile32 = (u32*) levelFile;
     
 	for(int i = 0; i < 14; i++)
 	{
 		levelBlocksLen[i] = levelFile32[i*2+1];
 		levelBlocks[i] = levelFile + levelFile32[i*2];
-        iprintf("%d -> %x %x\n", i, levelBlocksLen[i], levelBlocks[i]);
 	}
 	
 
@@ -118,12 +120,11 @@ void loadSprites()
 
 }
 
-void loadLevel(uint levelFileIDp, uint bgdatFileIDp)
+void loadLevel(string pf)
 {
 	loaded = true;
 	
-	levelFileID = levelFileIDp;
-	bgdatFileID = bgdatFileIDp;
+    levelFilePrefix = pf;
 	
     objects = list<LevelObject>();
     sprites = list<LevelSprite>();

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#include "nitrofs.h"
 
 #ifndef _ROM_H
 #define _ROM_H
@@ -55,25 +56,18 @@ typedef enum {
 
 
 
-extern FILE* rom;
-extern sNDSHeader romHeader;
+extern NitroFilesystem* fs;
 extern uint8 *overlay0;
 extern RomRegion region;
 
-uint readUInt(FILE* file);
-uint readUShort(FILE* file);
 void loadROM();
 void closeROM();
-void loadHeader();
-uint8_t* loadData(uint offs, uint size);
-void loadDataInto(uint offs, uint size, void* dest);
-void loadCompressedData(uint offs, uint size, void* dest);
-uint8_t* loadFileFromROM(uint fileID);
-void loadFileFromROMInto(uint fileID, void* dest);
-uint32 getFileSizeFromROM(uint fileID);
-void loadCompressedFileFromROM(uint fileID, void* dest);
+
 int getFileIDFromTable(Overlay0OffsetName table, uint entry);
-bool dmaCopySafe(const void *src, void *dst, u32 size);
+void cpuCopy8(const void* src, void* dest, u32 len);
+void cpuCopy16(const void* src, void* dest, u32 len);
+void cpuCopy32(const void* src, void* dest, u32 len);
+uint8* decompressOverlay(uint8* sourcedata, uint sourcedataLength);
 
 extern int overlay0Offsets[17][4];
 

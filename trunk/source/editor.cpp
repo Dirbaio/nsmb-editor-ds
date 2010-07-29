@@ -37,21 +37,13 @@ bool resizeLeft = false;
 bool resizeTop = false;
 
 
-uint calcLevelFileID(uint levNum)
-{
-	uint res = 822 + levNum*2;
-	if(levNum >= 14) res++;
-	
-	return res;
-}
 
 
 void loadEditor(uint lev)
 {
 	unloadLevel();
 	iprintf("Loading Editor. Level %d\n", lev);
-	int fid = calcLevelFileID(lev);
-	loadLevel(fid, fid+1);
+	loadLevel("A01_1");
 	iprintf("Level loaded. ");
 	levelx = 0;
 	levely = 0;

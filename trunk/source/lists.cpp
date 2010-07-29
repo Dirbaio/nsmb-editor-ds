@@ -15,55 +15,41 @@
 *   along with NSMB Editor DS.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "lists.h"
 
-#include<list>
-#include "rom.h"
-#include "tilesets.h"
+#include <stdio.h>
 
-#define MSCREEN_WIDTH 64
-#define MSCREEN_HEIGHT 64
+vector<string> jyotyuAnnotationList;
+vector<string> spriteList;
+vector<string> tilesetList;
+vector<string> topBGList;
+vector<string> bottomBGList;
 
 
-#define VSCREEN_WIDTH 16
-#define VSCREEN_HEIGHT 12
-
-using namespace std;
-
-#ifndef _LEVEL_H
-#define _LEVEL_H
-
-class LevelElement
+void loadList(const char* fname, vector<string>& v)
 {
-	public:
-	int x, y;
-	int tx, ty;
-	bool selected;
-	
-	virtual int getSizeMultiplier();
-	virtual bool isResizable();
-};
+    v.clear();
+    
+    char mystring[100];
+    
+    iprintf("%s\n", fname);
+    FILE* f = fopen (fname, "rb");
+    
+    if (f == NULL) perror ("Error opening file");
+    else
+    {
+        while(!feof(f))
+        {
+            fgets (mystring , 100 ,f);
+            string s = mystring;
+            s = s.substr(0, s.size()-2);
+            v.push_back(s);
+        }
+        fclose (f);
+    }
+}
 
-class LevelObject : public LevelElement
+void loadLists()
 {
-	public:
-	int objNum;
-	int tilesetNum;
-};
-
-class LevelSprite : public LevelElement
-{
-	public:
-	LevelSprite();
-	byte spriteData[6];
-	int spriteNum;
-	virtual bool isResizable();
-};
-
-
-extern list<LevelObject> objects;
-extern list<LevelSprite> sprites;
-
-void loadLevel(string pf);
-void unloadLevel();
-
-#endif
+    loadList("sprlist.txt", spriteList);
+}

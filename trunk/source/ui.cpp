@@ -62,6 +62,7 @@ void renderButton(int pos, int btn, bool sel)
 	setTileXY(pos*2+1, 1, btn*4+3, sel);
 }
 
+
 void renderUI()
 {
 	bg1ptr=  (uint16*)0x0601C000;
@@ -89,10 +90,10 @@ void uiShow()
 {
 	uiOn = true;
 	bgInit(1, BgType_Text8bpp, BgSize_T_256x256, 0x18, 0x4);
-	dmaCopySafe(&uiGraphicsTiles, bgGetGfxPtr(1) + 128, uiGraphicsTilesLen);
+	cpuCopy16(&uiGraphicsTiles, bgGetGfxPtr(1) + 128, uiGraphicsTilesLen);
 	
 	vramSetBankE(VRAM_E_LCD);
-	dmaCopySafe(&uiGraphicsPal, VRAM_E_EXT_PALETTE[1][0], uiGraphicsPalLen);
+	cpuCopy16(&uiGraphicsPal, VRAM_E_EXT_PALETTE[1][0], uiGraphicsPalLen);
 	shadeExtPal(1);
 	vramSetBankE(VRAM_E_BG_EXT_PALETTE);
 
