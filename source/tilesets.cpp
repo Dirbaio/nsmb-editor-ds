@@ -21,9 +21,6 @@
 #include "tilegfx.h"
 #include "level.h"
 
-uint16 map16Data [TOTAL_MAP16][4];
-
-
 const uint16 map16Overlays [256][4] = 
 {
 
@@ -549,6 +546,7 @@ const uint16 map16ExtraData[256][4] =
 
 objPointer *objectIndex[3];
 uint8 *objectDefinitions[3];
+uint16 map16Data [TOTAL_MAP16][4];
 
 void createOverrides()
 {
@@ -567,49 +565,63 @@ void createOverrides()
 void loadTilesets(int tileset)
 {
 
-    void* bg2Ptr = bgGetGfxPtr(2);
+    u16* bg2Ptr = bgGetGfxPtr(2);
 	//Load graphics
     
-	loadCompressedFileFromROM(jyoytu_ncg_fileID[region], bg2Ptr );
-	loadCompressedFileFromROM(
-		getFileIDFromTable(Table_TS_NCG, tileset),
-		bgGetGfxPtr(2)+0x1800
-	);
-	loadCompressedFileFromROM(subnohara_ncg_fileID[region], bgGetGfxPtr(2)+0x5000);
-	dmaCopySafe(&tilegfxTiles, bgGetGfxPtr(2)+0x6000, tilegfxTilesLen);
+    fs->getFileById(jyoytu_ncg_fileID[region])
+        ->loadCompressedContentsInto(bg2Ptr);
+    fs->getFileById(getFileIDFromTable(Table_TS_NCG, tileset))
+        ->loadCompressedContentsInto(bg2Ptr+0x1800);
+    fs->getFileById(subnohara_ncg_fileID[region])
+        ->loadCompressedContentsInto(bg2Ptr+0x5000);
+
+	cpuCopy16(&tilegfxTiles, bgGetGfxPtr(2)+0x6000, tilegfxTilesLen);
 
 	//Load the Palettes
 	vramSetBankE(VRAM_E_LCD);
-	loadCompressedFileFromROM(jyoytu_ncl_fileIDs[0][region], VRAM_E_EXT_PALETTE[2]);
-	loadCompressedFileFromROM(
-		getFileIDFromTable(Table_TS_NCL, tileset),
-		VRAM_E_EXT_PALETTE[2][2]
-	);
-	loadCompressedFileFromROM(subnohara_ncl_fileID[region], VRAM_E_EXT_PALETTE[2][6]);
-	dmaCopySafe(&tilegfxPal, VRAM_E_EXT_PALETTE[2][4], tilegfxPalLen);
-	dmaCopySafe(&tilegfxPal, VRAM_E_EXT_PALETTE[3][0], tilegfxPalLen);
+    fs->getFileById(jyoytu_ncl_fileIDs[0][region])
+        ->loadCompressedContentsInto(VRAM_E_EXT_PALETTE[2]);
+    fs->getFileById(getFileIDFromTable(Table_TS_NCL, tileset))
+        ->loadCompressedContentsInto(VRAM_E_EXT_PALETTE[2][2]);
+    fs->getFileById(subnohara_ncl_fileID[region])
+        ->loadCompressedContentsInto(VRAM_E_EXT_PALETTE[2][6]);
+        
+	cpuCopy16(&tilegfxPal, VRAM_E_EXT_PALETTE[2][4], tilegfxPalLen);
+	cpuCopy16(&tilegfxPal, VRAM_E_EXT_PALETTE[3][0], tilegfxPalLen);
 	shadeExtPal(2);
 	shadeExtPal(3);
 	vramSetBankE(VRAM_E_BG_EXT_PALETTE);
 	
 	//Load the MAP16!
-	loadFileFromROMInto(jyoytu_pnl_fileID[region], &map16Data);
-	loadFileFromROMInto(
-		getFileIDFromTable(Table_TS_PNL, tileset),
-		&map16Data[MAP16_PAGE*1]
-	);
-	loadFileFromROMInto(subnohara_pnl_fileID[region], &map16Data[MAP16_PAGE*4]);
+    fs->getFileById(jyoytu_pnl_fileID[region])
+        ->loadContentsInto(&map16Data);
+    fs->getFileById(getFileIDFromTable(Table_TS_PNL, tileset))
+        ->loadContentsInto(&map16Data[MAP16_PAGE*1]);
+    fs->getFileById(subnohara_pnl_fileID[region])
+        ->loadContentsInto(&map16Data[MAP16_PAGE*4]);
 	
 	//Load the Object Indexes!!!
-	objectIndex[0] = (objPointer*) loadFileFromROM(jyoytu_unt_hd_fileID[region]);
-	objectIndex[1] = (objPointer*) loadFileFromROM(getFileIDFromTable(Table_TS_UNT_HD, tileset));
-	objectIndex[2] = (objPointer*) loadFileFromROM(subnohara_unt_hd_fileID[region]);
+	objectIndex[0] = (objPointer*) 
+        fs->getFileById(jyoytu_unt_hd_fileID[region])
+            ->getContents();
+	objectIndex[1] = (objPointer*) 
+        fs->getFileById(getFileIDFromTable(Table_TS_UNT_HD, tileset))
+            ->getContents();
+	objectIndex[2] = (objPointer*) 
+        fs->getFileById(subnohara_unt_hd_fileID[region])
+            ->getContents();
 
 	//Load the Object Files!!!
-	objectDefinitions[0] = loadFileFromROM(jyoytu_unt_fileID[region]);
-	objectDefinitions[1] = loadFileFromROM(getFileIDFromTable(Table_TS_UNT, tileset));
-	objectDefinitions[2] = loadFileFromROM(subnohara_unt_fileID[region]);
-	
+	objectDefinitions[0] = 
+        fs->getFileById(jyoytu_unt_fileID[region])
+            ->getContents();
+	objectDefinitions[1] =
+        fs->getFileById(getFileIDFromTable(Table_TS_UNT, tileset))
+            ->getContents();
+	objectDefinitions[2] = 
+        fs->getFileById(subnohara_unt_fileID[region])
+            ->getContents();
+            
 	createOverrides();
 }
 

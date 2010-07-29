@@ -32,6 +32,10 @@
 #include "control.h"
 #include "oamUtil.h"
 
+#include "selectablelist.h"
+#include "lists.h"
+#include "nitrofs.h"
+
 #define mapxy(x, y) map[x+y*32]
 
 int main(void)  
@@ -43,9 +47,8 @@ int main(void)
 	iprintf("NSMB Editor DS!\n");
 	iprintf("By Dirbaio\n\n");
 	iprintf("Built %s %s\n\n", __DATE__, __TIME__);
-	
-//	testLinkedLists();
-	
+    
+    
 	BG_PALETTE[0] = 0xEE0E;
 	
 	lcdMainOnBottom();
@@ -56,11 +59,17 @@ int main(void)
 	vramSetBankD(VRAM_D_MAIN_BG_0x06000000);
 	vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
 
+
 	if (!fatInitDefault())
 	{
         iprintf("Error loading FAT. Halting.");
-        return 1;
+        while(1);
 	}
+    
+    
+    loadLists();
+    
+//    showList(spriteList);
 
     iprintf("Loading Rom!\n");
     loadROM();
@@ -80,14 +89,9 @@ int main(void)
 	bgSetPriority(3, 0);
 	REG_BG3CNT |= BG_WRAP_ON;
 	bgUpdate();
-	iprintf("Done!\n");
+	iprintf("Done loading everything!\n");
 	
-	touchPosition touch;
-
-	int lastx = 0;
-	int lasty = 0;
-
-    
+     
 	iprintf("Going to main loop!\n");
 	while(1)
 	{

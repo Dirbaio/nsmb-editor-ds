@@ -26,11 +26,11 @@ void loadOAM()
 	//and no external palette support
 	oamInit(&oamMain, SpriteMapping_2D , true);
 	
-	dmaCopySafe(&oamGfxTiles, SPRITE_GFX, oamGfxTilesLen);
-
+	cpuCopy16(&oamGfxTiles, SPRITE_GFX, oamGfxTilesLen);
+    
 	//Load the Palettes
 	vramSetBankF(VRAM_F_LCD);
-	dmaCopySafe(&oamGfxPal, VRAM_F_EXT_PALETTE[0][0], oamGfxPalLen);
+	cpuCopy16(&oamGfxPal, VRAM_F_EXT_PALETTE[0][0], oamGfxPalLen);
 	vramSetBankF(VRAM_F_SPRITE_EXT_PALETTE);
 }
 

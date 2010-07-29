@@ -15,55 +15,10 @@
 *   along with NSMB Editor DS.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include<list>
-#include "rom.h"
-#include "tilesets.h"
-
-#define MSCREEN_WIDTH 64
-#define MSCREEN_HEIGHT 64
-
-
-#define VSCREEN_WIDTH 16
-#define VSCREEN_HEIGHT 12
+#include<nds.h>
+#include<vector>
+#include<string>
 
 using namespace std;
 
-#ifndef _LEVEL_H
-#define _LEVEL_H
-
-class LevelElement
-{
-	public:
-	int x, y;
-	int tx, ty;
-	bool selected;
-	
-	virtual int getSizeMultiplier();
-	virtual bool isResizable();
-};
-
-class LevelObject : public LevelElement
-{
-	public:
-	int objNum;
-	int tilesetNum;
-};
-
-class LevelSprite : public LevelElement
-{
-	public:
-	LevelSprite();
-	byte spriteData[6];
-	int spriteNum;
-	virtual bool isResizable();
-};
-
-
-extern list<LevelObject> objects;
-extern list<LevelSprite> sprites;
-
-void loadLevel(string pf);
-void unloadLevel();
-
-#endif
+int showList(vector<string>& lst);

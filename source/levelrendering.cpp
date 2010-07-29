@@ -117,7 +117,7 @@ void renderTile(uint8* obj, uint& pos, uint xp, uint yp)
 
 void putArray(uint8 *obj, uint xp, uint yp, uint w, uint h, uint x, uint y, bool& put)
 {
-//	iprintf("putarray %x %d %d\n", obj, x, y);
+
 	uint xo = x;
 	uint pos = 0;
 	uint8 trash;
@@ -182,7 +182,7 @@ void renderSlopeObject(uint8* obj, uint xp, uint yp, uint w, uint h)
 		}
 	}
 	
-//	iprintf("ss %d %d, %d %d %d\n", slopeSectionWidth, slopeSectionHeight, subSectionWidth, subSectionHeight, hasSubSection);
+
 	
 	controlByte = obj[0];
 
@@ -382,19 +382,15 @@ void renderStdObject(uint8* obj, uint xp, uint yp, uint w, uint h)
 
 void renderObject(uint objNum, uint tilesetNum, uint xp, uint yp, uint w, uint h)
 {
-//	iprintf("obj %d %d: %d %d, %d %d\n", tilesetNum, objNum, xp, yp, w, h);
+
 	uint8* obj = objectDefinitions[tilesetNum] + objectIndex[tilesetNum][objNum].offs;
 	if(obj[0] & 0x80)
     {
-        iprintf("m");
 		renderSlopeObject(obj, xp, yp, w, h);
-        iprintf("n");
     }
 	else
     {
-        iprintf("o");
 		renderStdObject(obj, xp, yp, w, h);
-        iprintf("p");
     }
 }
 
@@ -461,7 +457,6 @@ void renderTileRect(int xx, int yy, int tx, int ty, int linetile)
 
 void renderSprites()
 {
-    iprintf("f");
 	for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); ++i)
 	{
 		if(!onScreen(*i)) continue;
@@ -479,26 +474,21 @@ void renderSprites()
 		setTileXYb(i->x*2,   i->y*2+1, 0x3DC + sprNum / 10 % 10);
 		setTileXYb(i->x*2+1, i->y*2+1, 0x3DC + sprNum / 1 % 10);
 	}
-    iprintf("g");
+
 }
 
 void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 {
-    iprintf(" %d ", objects.size());
+    
 	bg2ptr = (uint16*)0x06018000;
 	bg3ptr = (uint16*)0x0601A000;
-	
-	/*
-	iprintf("r\n");
-	iprintf("bg2 %x\n", bg2ptr);
-	iprintf("bg3 %x\n", bg2ptr);*/
-	
+		
 	xMin = xMins;
 	yMin = yMins;
 	xMax = xMaxs;
 	yMax = yMaxs;
 		
-    iprintf("a");
+    
 	//Zero out the zone we're going to redraw...
 	for(uint x = xMin; x <= xMax; x++)
 		for(uint y = yMin; y <= yMax; y++)
@@ -510,22 +500,22 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 		setMap16TileXY(x, y, x+y*16);
 	*/
 	
-    iprintf("b");
-    iprintf(" %d ", objects.size());
+    
+
 	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
 	{
-        iprintf("h");
+
 		if(onScreen(*i))
 		{
-            iprintf("i");
+
 			renderingSelected = i->selected;
 			renderObject(i->objNum, i->tilesetNum, 
 				i->x, i->y, 
 				i->tx, i->ty);
-            iprintf("j");
+
 		}
 	}
-    iprintf("c");
+
 	
 	renderingSelected = false;
 	
@@ -539,10 +529,10 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 			
 		}
 	}
-    iprintf("d");
+
 	
 	renderSprites();
-    iprintf("e");
+
 }
 
 
