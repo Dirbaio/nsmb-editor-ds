@@ -64,6 +64,7 @@ extern list<LevelObject> objects;
 extern list<LevelSprite> sprites;
 
 void loadLevel(string pf);
+void saveLevel();
 void unloadLevel();
 
 #endif

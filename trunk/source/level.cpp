@@ -24,7 +24,6 @@ list<LevelSprite> sprites;
 string levelFilePrefix;
 
 
-uint8* levelFile;
 uint8 *levelBlocks[14];
 uint levelBlocksLen[14];
 
@@ -67,7 +66,29 @@ void loadObjects()
 	
 	delete[] bgdatFile;
 }
+void saveObjects()
+{
+    int objCount = objects.size();
+    iprintf("Saving... %d\n", objCount);
+    u16* bgdatFile = new u16[objCount * 5 + 1];
+    int filePos = 0;
+    
+    for(list<LevelObject>::iterator it = objects.begin(); it != objects.end(); it++)
+    {
+        bgdatFile[filePos + 0] = it->objNum & 0xFFF | (it->tilesetNum & 0xF)<<12;
+        bgdatFile[filePos + 1] = it->x;
+        bgdatFile[filePos + 2] = it->y;
+        bgdatFile[filePos + 3] = it->tx;
+        bgdatFile[filePos + 4] = it->ty;
+        filePos += 5;
+    }
+    
+    bgdatFile[objCount*5] = 0xFFFF; // WHY??????
 
+    NitroFile* fp = fs->getFileByName(levelFilePrefix+"_bgdat.bin");
+    fp->replaceContents(bgdatFile, objCount*10+2);
+    iprintf("saved");
+}
 
 struct blockPtr
 {
@@ -78,15 +99,18 @@ struct blockPtr
 void loadBlocks()
 {
     NitroFile* levFil = fs->getFileByName(levelFilePrefix+".bin");
-	levelFile = levFil->getContents();
+	u8* levelFile = levFil->getContents();
     u32* levelFile32 = (u32*) levelFile;
     
 	for(int i = 0; i < 14; i++)
 	{
 		levelBlocksLen[i] = levelFile32[i*2+1];
-		levelBlocks[i] = levelFile + levelFile32[i*2];
+        
+		levelBlocks[i] = new u8[levelBlocksLen[i]];
+        iprintf("%x\n", levelBlocks[i]);
+        cpuCopy8(levelFile + levelFile32[i*2], levelBlocks[i], levelBlocksLen[i]);
 	}
-	
+	delete[] levelFile;
 
 }
 
@@ -136,7 +160,10 @@ void loadLevel(string pf)
 	loadSprites();
 	loadTilesets(tilnum);
 }
-
+void saveLevel()
+{
+    saveObjects();
+}
 void unloadLevel()
 {
 	if(!loaded) return;

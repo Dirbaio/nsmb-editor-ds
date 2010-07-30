@@ -228,5 +228,5 @@ void editorRenderSprites()
 
 void saveEditor()
 {
-	
+	saveLevel();
 }
