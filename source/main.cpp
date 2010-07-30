@@ -91,7 +91,14 @@ int main(void)
 	bgUpdate();
 	iprintf("Done loading everything!\n");
 	
-     
+    /*
+    NitroFile* f = fs->getFileByName("A01_1.bin");
+    f->print();
+    u8* cts = f->getContents();
+    f->replaceContents(cts, f->size);
+    iprintf("NitroFS test done\n");
+    while(1);
+     */
 	iprintf("Going to main loop!\n");
 	while(1)
 	{

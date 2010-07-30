@@ -19,23 +19,25 @@
 #include<algorithm>
 
 
-bool operator<(const NitroFile* a, const NitroFile* b)
+bool operator<(const NitroFile& a, const NitroFile& b)
 {
-    if(a->begOffs == b->begOffs)
-        return a->size < b->size;
+    if(a.begOffs == b.begOffs)
+        return a.size < b.size;
     return a.begOffs < b.begOffs;
 }
 
 
 
-NitroFile::NitroFile(FILE* romFile, int id, int begOffs, int endOffs, NitroFilesystem* parent, bool fixedBeg, bool fixedEnd, bool endsize, string name)
+NitroFile::NitroFile(int id, int begOffs, int endOffs, NitroFilesystem* parent, NitroFile* allocFile, bool fixedBeg, bool fixedEnd, bool endsize, string name)
 {
     this->fixedBeg = fixedBeg;
     this->fixedEnd = fixedEnd;
-    this->romFile = romFile;
     this->parent = parent;
     this->name = name;
     this->id = id;
+    this->allocFile = allocFile;
+    cached = false;
+    cacheModified = false;
     
     if(fixedBeg)
         this -> begOffs = begOffs;
@@ -55,13 +57,11 @@ void NitroFile::loadOffsets()
 {
     if(!fixedBeg)
     {
-        fseek(romFile, begPtrOffs, SEEK_SET);
-        begOffs = readUInt(romFile);
+        begOffs = allocFile->getUintAt(begPtrOffs);
     }
     if(!fixedEnd)
     {
-        fseek(romFile, endPtrOffs, SEEK_SET);
-        endOffs = readUInt(romFile);
+        endOffs = allocFile->getUintAt(endPtrOffs);
         
         if(endsize)
         {
@@ -76,17 +76,15 @@ void NitroFile::saveOffsets()
 {
     if(!fixedBeg)
     {
-        fseek(romFile, begPtrOffs, SEEK_SET);
-        writeUInt(romFile, begOffs);
+        allocFile->setUintAt(begPtrOffs, begOffs);
     }
     
     if(!fixedEnd)
     {
-        fseek(romFile, endPtrOffs, SEEK_SET);
         if(endsize)
-            writeUInt(romFile, endOffs-begOffs);
+            allocFile->setUintAt(endPtrOffs, size);
         else
-            writeUInt(romFile, endOffs);    
+            allocFile->setUintAt(endPtrOffs, endOffs);
     }
 }
 
@@ -94,14 +92,15 @@ u8* NitroFile::getContents()
 {
     if(endOffs < begOffs)
     {
+        print();
         iprintf("endOffs < begOffs\n");
         while(1);
     }
     
-    fseek(romFile, begOffs, SEEK_SET);
+    fseek(parent->romFile, begOffs, SEEK_SET);
     
     u8* res = new u8[endOffs-begOffs];
-    fread(res, 1, endOffs-begOffs, romFile);
+    fread(res, 1, endOffs-begOffs, parent->romFile);
     return res;
 }
 
@@ -110,13 +109,14 @@ void NitroFile::loadContentsInto(void* ptru)
     u8* ptr = (u8*) ptru;
     if(endOffs < begOffs)
     {
+        print();
         iprintf("endOffs < begOffs\n");
         while(1);
     }
     
-    fseek(romFile, begOffs, SEEK_SET);
+    fseek(parent->romFile, begOffs, SEEK_SET);
     
-    fread(ptr, 1, endOffs-begOffs, romFile);
+    fread(ptr, 1, endOffs-begOffs, parent->romFile);
 }
 
 	
@@ -125,14 +125,15 @@ void NitroFile::loadCompressedContentsInto(void* destu)
     u16* dest = (u16*) destu;
     if(endOffs < begOffs)
     {
+        print();
         iprintf("endOffs < begOffs\n");
         while(1);
     }
     
-    fseek(romFile, begOffs, SEEK_SET);
+    fseek(parent->romFile, begOffs, SEEK_SET);
     
     u8* res = new u8[endOffs-begOffs];
-    fread(res, 1, endOffs-begOffs, romFile);
+    fread(res, 1, endOffs-begOffs, parent->romFile);
 
 	uint32 decsize = res[1] | res[2]<<8 | res[3]<<16;
 	uint16* buffer = new uint16[decsize/2];
@@ -145,9 +146,27 @@ void NitroFile::loadCompressedContentsInto(void* destu)
     delete[] res;
 }
 
-void NitroFile::replaceContents(u8* ptr, int size)
+void NitroFile::replaceContents(void* ptr, int nsize)
 {
-    iprintf("Not implemented yet");
+    iprintf("Replacing: ");
+    print();
+    int newOffs = begOffs;
+    if(size <  nsize)
+    {
+        int newOffs = parent->findFreeSpace(size);
+        iprintf("%x -> %x", size, newOffs);
+    }
+
+    begOffs = newOffs;
+    size = nsize;
+    endOffs = begOffs+size;
+    
+    fseek(parent->romFile, begOffs, SEEK_SET);
+    fwrite(ptr, 1, nsize, parent->romFile);
+    
+    saveOffsets();
+    if(!cached)
+        parent->flushCache();
 }
 
 u8 NitroFile::getByteAt(int offs)
@@ -155,8 +174,8 @@ u8 NitroFile::getByteAt(int offs)
     if(cached)
         return cachedContents[offs];
 
-    fseek(romFile, begOffs+offs, SEEK_SET);
-    return readByte(romFile);
+    fseek(parent->romFile, begOffs+offs, SEEK_SET);
+    return readByte(parent->romFile);
 }
 void NitroFile::setByteAt(int offs, u8 val)
 {
@@ -167,15 +186,15 @@ void NitroFile::setByteAt(int offs, u8 val)
         return;
     }
     
-    fseek(romFile, begOffs+offs, SEEK_SET);
-    writeByte(romFile, val);
+    fseek(parent->romFile, begOffs+offs, SEEK_SET);
+    writeByte(parent->romFile, val);
 }
 u16 NitroFile::getUshortAt(int offs)
 {
     if(cached)
         return *(u16*)(cachedContents+offs);
-    fseek(romFile, begOffs+offs, SEEK_SET);
-    return readUShort(romFile);
+    fseek(parent->romFile, begOffs+offs, SEEK_SET);
+    return readUShort(parent->romFile);
 }
 void NitroFile::setUshortAt(int offs, u16 val)
 {
@@ -185,35 +204,38 @@ void NitroFile::setUshortAt(int offs, u16 val)
         cacheModified = true;
         return;
     }
-    fseek(romFile, begOffs+offs, SEEK_SET);
-    writeUShort(romFile, val);
+    fseek(parent->romFile, begOffs+offs, SEEK_SET);
+    writeUShort(parent->romFile, val);
 }
 u32 NitroFile::getUintAt(int offs)
 {
     if(cached)
         return *(u32*)(cachedContents+offs);
-    fseek(romFile, begOffs+offs, SEEK_SET);
-    return readUInt(romFile);
+    fseek(parent->romFile, begOffs+offs, SEEK_SET);
+    return readUInt(parent->romFile);
 }
 void NitroFile::setUintAt(int offs, u32 val)
 {
     if(cached)
     {
+    iprintf("== %s: %x = %x\n", name.c_str(), offs, val);
         *(u32*)(cachedContents+offs) = val;
         cacheModified = true;
         return;
     }
-    fseek(romFile, begOffs+offs, SEEK_SET);
-    writeUInt(romFile, val);
+    fseek(parent->romFile, begOffs+offs, SEEK_SET);
+    writeUInt(parent->romFile, val);
 }
 
 void NitroFile::print()
 {
-    iprintf("%d: %x-%x %s\n", id, begOffs, endOffs, name.c_str());
+    iprintf("%d: %x-%x %s %d %d\n", id, begOffs, endOffs, name.c_str(), cached, cacheModified);
 }
 
 void NitroFile::enableCache()
 {
+    iprintf("Caching: ");
+    print();
     cached = true;
     cacheModified = false;
     cachedContents = getContents();
@@ -236,6 +258,7 @@ NitroFile::~NitroFile()
 
 void NitroFilesystem::addFile(NitroFile *f)
 {
+//    f->print();
     filesByName[f->name] = f;
     filesById[f->id] = f;
     allFiles.push_back(f);
@@ -244,9 +267,8 @@ void NitroFilesystem::addFile(NitroFile *f)
 void NitroFilesystem::loadOvTable(NitroFile* f)
 {
     NitroFile* fatFile = filesByName["fat.bin"];
-    int fatOffset = fatFile->begOffs;
     
-    u32 size = f->size;
+    int size = f->size;
     size /= sizeof(OverlayEntry);
     
     OverlayEntry* ovs = (OverlayEntry*) f->getContents();
@@ -255,8 +277,8 @@ void NitroFilesystem::loadOvTable(NitroFile* f)
     {
         u32 id = ovs[i].fileId;
   //      iprintf("%d ", id);
-        NitroFile* tf = new NitroFile(romFile, id, fatOffset+id*8, 
-        fatOffset+id*8+4, this, false, false, false, "overlayfile");
+        NitroFile* tf = new NitroFile(id, id*8, 
+        id*8+4, this, fatFile, false, false, false, "overlayfile");
         addFile(tf);
     }
     
@@ -273,23 +295,24 @@ NitroFilesystem::NitroFilesystem(const char* fn)
         iprintf("ERROR: Romfile = null. Halting!\n");
         while(1);
     }
-    
+    romPath = fn;
     iprintf("Loading NitroFS\n");
-    addFile(new NitroFile(romFile, -1, 0, 0x200, this, true, true, false, "header.bin"));
-    addFile(new NitroFile(romFile, -1, 0x20, 0x2C, this, false, false, true, "arm9.bin"));
-    addFile(new NitroFile(romFile, -1, 0x30, 0x3C, this, false, false, true, "arm7.bin"));
-    addFile(new NitroFile(romFile, -1, 0x40, 0x44, this, false, false, true, "fnt.bin"));
-    addFile(new NitroFile(romFile, -1, 0x48, 0x4C, this, false, false, true, "fat.bin"));
-    addFile(new NitroFile(romFile, -1, 0x50, 0x54, this, false, false, true, "arm9ovt.bin"));
-    addFile(new NitroFile(romFile, -1, 0x58, 0x5C, this, false, false, true, "arm7ovt.bin"));
-    addFile(new NitroFile(romFile, -1, 0x58, 0x840, this, false, true, true, "banner.bin"));
+    NitroFile* headerFile = new NitroFile(-1, 0, 0x200, this, NULL, true, true, false, "header.bin");
+    addFile(headerFile);
+    headerFile->enableCache();
+    addFile(new NitroFile(-1, 0x20, 0x2C, this, headerFile, false, false, true, "arm9.bin"));
+    addFile(new NitroFile(-1, 0x30, 0x3C, this, headerFile, false, false, true, "arm7.bin"));
+    addFile(new NitroFile(-1, 0x40, 0x44, this, headerFile, false, false, true, "fnt.bin"));
+    addFile(new NitroFile(-1, 0x48, 0x4C, this, headerFile, false, false, true, "fat.bin"));
+    addFile(new NitroFile(-1, 0x50, 0x54, this, headerFile, false, false, true, "arm9ovt.bin"));
+    addFile(new NitroFile(-1, 0x58, 0x5C, this, headerFile, false, false, true, "arm7ovt.bin"));
+    addFile(new NitroFile(-1, 0x58, 0x840, this, headerFile, false, true, true, "banner.bin"));
     
     NitroFile* fatFile = filesByName["fat.bin"];
     fatFile->enableCache();
     NitroFile* fntFile = filesByName["fnt.bin"];
     fntFile->enableCache();
-    
-    int fatOffset = fatFile->begOffs;
+ 
     int dirCount = fntFile->getUshortAt(0x06);
     for(int i = 0; i < dirCount; i++)
     {
@@ -312,8 +335,8 @@ NitroFilesystem::NitroFilesystem(const char* fn)
             {
                 int thisId = firstId;
                 firstId++;
-                NitroFile* tf = new NitroFile(romFile, thisId, fatOffset+thisId*8, fatOffset+thisId*8+4, 
-                    this, false, false, false, fname);
+                NitroFile* tf = new NitroFile(thisId, thisId*8, thisId*8+4, 
+                    this, fatFile, false, false, false, fname);
                 addFile(tf);
     //            tf->print();
             }
@@ -330,12 +353,12 @@ NitroFilesystem::NitroFilesystem(const char* fn)
 
 int NitroFilesystem::findFreeSpace(int len)
 {
-    allFiles.Sort(); //sort by offset
+    allFiles.sort(); //sort by offset
     
-    for (list<NitroFile>::iterator it = allFiles.begin; i != allFiles.end(); i++)
+    for (list<NitroFile*>::iterator it = allFiles.begin(); it != allFiles.end(); it++)
     {
         NitroFile* first = *it;
-        list<NitroFile>::iterator it2 = it;
+        list<NitroFile*>::iterator it2 = it;
         it2++;
         if(it2 == allFiles.end()) continue;
         NitroFile* second = *it2;
@@ -344,18 +367,14 @@ int NitroFilesystem::findFreeSpace(int len)
         if (spBegin % 4 != 0)
             spBegin += 4 - spBegin % 4;
 
-        int spEnd = second->beginOffs - 1;
+        int spEnd = second->begOffs - 1;
         if (spEnd % 4 != 0)
             spEnd -= spEnd % 4;
         
         int spSize = spEnd - spBegin;
         if (spSize >= len)
-        {
-            int spLeft = len - spSize;
-            
             if(spBegin >= 0x1400000)
                 return spBegin;
-        }
     }
 
     int lastFile = allFiles.back()->endOffs + 1;
@@ -368,11 +387,27 @@ int NitroFilesystem::findFreeSpace(int len)
         return lastFile;
 }
 
+void NitroFilesystem::flushCache()
+{
+    for(list<NitroFile*>::iterator it = allFiles.begin(); it != allFiles.end(); it++)
+        (*it)->flushCache();
+
+    fflush(romFile);
+    fclose(romFile);
+    romFile = fopen(romPath, "r+b");
+    if(romFile == NULL)
+    {
+        iprintf("ERROR: Romfile = null. Halting!\n");
+        while(1);
+    }
+    
+}
 NitroFilesystem::~NitroFilesystem()
 {
     for(list<NitroFile*>::iterator it = allFiles.begin(); it != allFiles.end(); it++)
         delete *it;
     
+    fflush(romFile);
     fclose(romFile);
 }
 
@@ -396,4 +431,5 @@ NitroFile* NitroFilesystem::getFileById(int id)
     }
     return res;
 }
+
 

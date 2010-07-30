@@ -91,22 +91,23 @@ class NitroFile
 {
     public:
     
-    FILE* romFile;
     int begPtrOffs, endPtrOffs;
+    NitroFile* allocFile;
     int begOffs, endOffs, size;
     int id;
     bool fixedBeg, fixedEnd, endsize;
     string name;
     NitroFilesystem* parent;
+
     
-    NitroFile(FILE* romFile, int id, int begOffs, int endOffs, NitroFilesystem* parent, bool fixedBeg, bool fixedEnd, bool endsize, string name);
+    NitroFile(int id, int begOffs, int endOffs, NitroFilesystem* parent, NitroFile* allocFile, bool fixedBeg, bool fixedEnd, bool endsize, string name);
     void loadOffsets();
     void saveOffsets();
     
     u8* getContents();
     void loadContentsInto(void* ptru);
     void loadCompressedContentsInto(void* ptru);
-    void replaceContents(u8* ptr, int size);
+    void replaceContents(void* ptr, int size);
     
     u8 getByteAt(int offs);
     void setByteAt(int offs, u8 val);
@@ -135,9 +136,10 @@ class NitroFilesystem
     map<string, NitroFile*> filesByName;
     map<int, NitroFile*> filesById;
     list<NitroFile*> allFiles;
+    const char* romPath;
     
-    FILE* romFile;
     public:
+    FILE* romFile;
     
     NitroFilesystem(const char* fn);
     int findFreeSpace(int len);
