@@ -16,6 +16,9 @@
 */
 
 
+#ifndef _EDITOR_H
+#define _EDITOR_H
+
 #include<nds.h>
 
 #include <stdio.h>
@@ -25,11 +28,10 @@
 
 #include "level.h"
 #include "levelrendering.h"
+#include "ui.h"
 
 using namespace std;
 
-#ifndef _EDITOR_H
-#define _EDITOR_H
 
 #define EDITACTION_SCROLL (0)
 #define EDITACTION_MOVE  (1)
