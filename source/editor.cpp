@@ -39,11 +39,11 @@ bool resizeTop = false;
 
 
 
-void loadEditor(uint lev)
+void loadEditor(string lev)
 {
 	unloadLevel();
-	iprintf("Loading Editor. Level %d\n", lev);
-	loadLevel("A01_1");
+	iprintf("Loading Editor. Level %s\n", lev.c_str());
+	loadLevel(lev);
 	iprintf("Level loaded. ");
 	levelx = 0;
 	levely = 0;
@@ -273,4 +273,38 @@ void editorRenderSprites()
 void saveEditor()
 {
 	saveLevel();
+}
+
+void editorDeleteObjects()
+{
+    list<LevelObject>::iterator i = objects.begin();
+    
+    while(i != objects.end())
+    {
+        if(i->selected)
+        {
+            list<LevelObject>::iterator ni = i;
+            ni++;
+            objects.erase(i);
+            i = ni;
+        }
+        else
+            i++;
+    }
+    
+    list<LevelSprite>::iterator i2 = sprites.begin();
+    
+    while(i2 != sprites.end())
+    {
+        if(i2->selected)
+        {
+            list<LevelSprite>::iterator ni = i2;
+            ni++;
+            sprites.erase(i2);
+            i2 = ni;
+        }
+        else
+            i2++;
+    }
+	repaintScreen();
 }

@@ -46,10 +46,11 @@ void renderText(int x, int y, uint max, int col, string& s)
     x %= 32;
     y %= 32;
     bg0ptr += x + y*32;
-    for(uint i = 0; i < s.size() && i < max; i++)
+    for(uint i = 0; i < max; i++)
     {
-        *bg0ptr = s[i] | col << 12;
-                    desmumePrint("l");
+        char c = ' ';
+        if(i < s.size()) c = s[i];
+        *bg0ptr = c | col << 12;
 
         bg0ptr++;
     }
@@ -66,14 +67,21 @@ void renderList(int y0)
         if(y < 0) continue;
         if(y >= (int)lsts.size()) continue;
 //        iprintf("%d\n", y);
-        
-        renderText(0, y, 32, 0, lsts[y]);
+        if(y == selection)
+            renderText(0, y, 32, 1, lsts[y]);
+        else
+            renderText(0, y, 32, 0, lsts[y]);
 //        iprintf("%d\n", y);
     } 
 }
-
 int showList(vector<string>& lst)
 {
+    return showList(lst, 0);
+}
+
+int showList(vector<string>& lst, int inisel)
+{
+    selection = inisel;
     lsts = lst;
     scrolly = 0;
     speedy = 0;
@@ -110,7 +118,13 @@ int showList(vector<string>& lst)
                 speedy -= diff / 10;
             }
             else
+            {
                 touchy = ytouchnow;
+                selection = (int)(touchy/8);
+                if(selection < 0) selection = 0;
+                if(selection >= lsts.size()) selection = lsts.size()-1;
+//                iprintf("%d\n", selection);
+            }
         }
         
         if(keysNowHeld & KEY_TOUCH)
@@ -146,10 +160,8 @@ int showList(vector<string>& lst)
             scrolly += speedy;
             bgSetScroll(0, 0, (int)(scrolly));
             bgUpdate();
-            desmumePrint("a");
             renderList((int)(scrolly/8));
             
-            desmumePrint("b");
         }
             
         lastTouchPress = (keysNowHeld & KEY_TOUCH) != 0;
@@ -157,6 +169,10 @@ int showList(vector<string>& lst)
         touchRead(&touch);
         keysNowPressed = keysDownRepeat();
         keysNowHeld = keysHeld();
+        if(keysNowPressed & KEY_RIGHT)
+            selecting = false;
         swiWaitForVBlank();
     }
+    bgHide(0);
+    return selection;
 }

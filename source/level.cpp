@@ -66,6 +66,7 @@ void loadObjects()
 	
 	delete[] bgdatFile;
 }
+
 void saveObjects()
 {
     int objCount = objects.size();
@@ -75,7 +76,7 @@ void saveObjects()
     
     for(list<LevelObject>::iterator it = objects.begin(); it != objects.end(); it++)
     {
-        bgdatFile[filePos + 0] = it->objNum & 0xFFF | (it->tilesetNum & 0xF)<<12;
+        bgdatFile[filePos + 0] = (it->objNum & 0xFFF) | ((it->tilesetNum & 0xF)<<12);
         bgdatFile[filePos + 1] = it->x;
         bgdatFile[filePos + 2] = it->y;
         bgdatFile[filePos + 3] = it->tx;
@@ -87,8 +88,8 @@ void saveObjects()
 
     NitroFile* fp = fs->getFileByName(levelFilePrefix+"_bgdat.bin");
     fp->replaceContents(bgdatFile, objCount*10+2);
-    iprintf("saved");
 }
+
 
 struct blockPtr
 {
@@ -107,11 +108,33 @@ void loadBlocks()
 		levelBlocksLen[i] = levelFile32[i*2+1];
         
 		levelBlocks[i] = new u8[levelBlocksLen[i]];
-        iprintf("%x\n", levelBlocks[i]);
         cpuCopy8(levelFile + levelFile32[i*2], levelBlocks[i], levelBlocksLen[i]);
 	}
 	delete[] levelFile;
+}
 
+void saveBlocks()
+{
+    int levelFileLen = 14*8;
+    for(int i = 0; i<14; i++)
+        levelFileLen += levelBlocksLen[i];
+        
+    u8* levelFile = new u8[levelFileLen];
+    u32* levelFile32 = (u32*) levelFile;
+    
+    int filePos = 14*8;
+    for(int i = 0; i < 14; i++)
+    {
+        levelFile32[i*2] = filePos;
+        levelFile32[i*2+1] = levelBlocksLen[i];
+        cpuCopy8(levelBlocks[i], levelFile+filePos, levelBlocksLen[i]);
+        filePos += levelBlocksLen[i];
+    }
+    
+    NitroFile* fp = fs->getFileByName(levelFilePrefix+".bin");
+    
+    fp->replaceContents(levelFile, levelFileLen);
+    
 }
 
 void loadSprites()
@@ -144,6 +167,38 @@ void loadSprites()
 
 }
 
+void saveSprites()
+{
+    uint8* block = new u8[sprites.size()*12 + 2];
+    int filePos = 0;
+    
+    for(list<LevelSprite>::iterator it = sprites.begin(); it != sprites.end(); it++)
+    {
+        LevelSprite& s = *it;
+        block[filePos++] = (u8) s.spriteNum;
+        block[filePos++] = (u8) (s.spriteNum >> 8);
+        block[filePos++] = (u8) s.x;
+        block[filePos++] = (u8) (s.x >> 8);
+        block[filePos++] = (u8) s.y;
+        block[filePos++] = (u8) (s.y >> 8);
+        block[filePos++] = s.spriteData[0];
+        block[filePos++] = s.spriteData[1];
+        block[filePos++] = s.spriteData[2];
+        block[filePos++] = s.spriteData[3];
+        block[filePos++] = s.spriteData[4];
+        block[filePos++] = s.spriteData[5];
+    }
+    
+    block[filePos++] = 0xFF;
+    block[filePos++] = 0xFF;
+    
+    if(levelBlocks[6])
+        delete[] levelBlocks[6];
+    levelBlocks[6] = block;
+    levelBlocksLen[6] = sprites.size()*12 + 2;
+}
+
+
 void loadLevel(string pf)
 {
 	loaded = true;
@@ -163,6 +218,9 @@ void loadLevel(string pf)
 void saveLevel()
 {
     saveObjects();
+    saveSprites();
+    
+    saveBlocks();
 }
 void unloadLevel()
 {

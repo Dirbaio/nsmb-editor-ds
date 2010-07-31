@@ -250,6 +250,14 @@ void NitroFile::flushCache()
     replaceContents(cachedContents, endOffs-begOffs);
 }
 
+
+void NitroFile::fixHeaderChecksum()
+{
+    if(!cached) return;
+    u16 crc = swiCRC16(0, cachedContents, 0x15E);
+    setUshortAt(0x15E, crc);
+}
+
 NitroFile::~NitroFile()
 {
     flushCache();
@@ -367,7 +375,9 @@ int NitroFilesystem::findFreeSpace(int len)
         int spBegin = first->endOffs;
         if (spBegin % 4 != 0)
             spBegin += 4 - spBegin % 4;
-
+        if(spBegin<=0x1400000)
+            spBegin = 0x1400000;
+            
         int spEnd = second->begOffs - 1;
         if (spEnd % 4 != 0)
             spEnd -= spEnd % 4;
@@ -395,7 +405,8 @@ void NitroFilesystem::flushCache()
     NitroFile* lastFile = allFiles.back();
     uint lastOffs = lastFile->endOffs + 0x10;
     lastOffs &= ~3;
-    getFileByName("fat.bin")->setUintAt(0x80, lastOffs);
+    getFileByName("header.bin")->setUintAt(0x80, lastOffs);
+    getFileByName("header.bin")->fixHeaderChecksum();
     
     for(list<NitroFile*>::iterator it = allFiles.begin(); it != allFiles.end(); it++)
         (*it)->flushCache();
@@ -429,6 +440,7 @@ NitroFile* NitroFilesystem::getFileByName(string name)
     }
     return res;
 }
+
 NitroFile* NitroFilesystem::getFileById(int id)
 {
     NitroFile* res = filesById[id];

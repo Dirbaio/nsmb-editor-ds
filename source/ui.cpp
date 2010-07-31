@@ -124,7 +124,7 @@ void uiTouchDown(int x, int y)
 		case 9 : editMode  = EDITMODE_PATHS    ; break;
 		case 10: editMode  = EDITMODE_PROGPATHS; break;
 		case 11: editMode  = EDITMODE_VIEWS    ; break;
-		case 12: editMode  = EDITMODE_ZONES    ; break;
+		case 12: editorDeleteObjects(); break;
 	}
 	
 	renderUI();

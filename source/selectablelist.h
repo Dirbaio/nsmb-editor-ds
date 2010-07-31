@@ -22,3 +22,4 @@
 using namespace std;
 
 int showList(vector<string>& lst);
+int showList(vector<string>& lst, int selection);

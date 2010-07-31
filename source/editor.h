@@ -48,10 +48,11 @@ using namespace std;
 extern uint editMode;
 extern uint editAction;
 
-void loadEditor(uint level);
+void loadEditor(string level);
 void editorTouchDown(uint x, uint y);
 void editorTouchMoved(uint x, uint y);
 void saveEditor();
 void editorRenderSprites();
+void editorDeleteObjects();
 
 #endif
