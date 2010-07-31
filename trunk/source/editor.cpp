@@ -77,8 +77,8 @@ bool elementInMultiRect(LevelElement& obj)
 	
 	if(obj.x > xMax*mult) return false;
 	if(obj.y > yMax*mult) return false;
-	if(obj.x + obj.tx < xMin*mult) return false;
-	if(obj.y + obj.ty < yMin*mult) return false;
+	if(obj.x + obj.tx <= xMin*mult) return false;
+	if(obj.y + obj.ty <= yMin*mult) return false;
 	return true;
 }
 
@@ -177,6 +177,22 @@ void doAction(LevelElement& e)
 		if(e.y + dy < 0) e.y = 0;
 		else e.y += dy;
 	}
+    
+    if(editAction == EDITACTION_RESIZE)
+    {
+        if(e.isResizable())
+        {
+            if(e.tx + dx <= 0)
+                e.tx = 1;
+            else
+                e.tx += dx;
+                
+            if(e.ty + dy <= 0)
+                e.ty = 1;
+            else
+                e.ty += dy;
+        }
+    }
 }
 
 void editorTouchMoved(uint x, uint y)
@@ -206,7 +222,35 @@ void editorTouchMoved(uint x, uint y)
 		multiSelectYb = ty/16;
 		doMultiSelection();
 	}
-	else
+	else if(editAction == EDITACTION_CLONE)
+    {
+        int ocount = objects.size();
+        list<LevelObject>::iterator it = objects.begin();
+        for(int i = 0; i < ocount; i++)
+        {
+            if(it->selected)
+            {
+                objects.push_back(*it);
+                it->selected = false;
+            }
+            it++;
+        }
+
+        int scount = sprites.size();
+        list<LevelSprite>::iterator it2 = sprites.begin();
+        for(int i = 0; i < scount; i++)
+        {
+            if(it2->selected)
+            {
+                sprites.push_back(*it2);
+                it2->selected = false;
+            }
+            it2++;
+        }
+        editAction = EDITACTION_MOVE;
+        renderUI();
+    }
+    else
 	{
 		for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
 			doAction(*i);

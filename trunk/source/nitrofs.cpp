@@ -19,14 +19,15 @@
 #include<algorithm>
 
 
-bool operator<(const NitroFile& a, const NitroFile& b)
+bool smaller(NitroFile const* a, NitroFile const* b)
 {
-    if(a.begOffs == b.begOffs)
-        return a.size < b.size;
-    return a.begOffs < b.begOffs;
+    if(!a) return true;
+    if(!b) return false;
+    
+    if(a->begOffs == b->begOffs)
+        return a->size < b->size;
+    return a->begOffs < b->begOffs;
 }
-
-
 
 NitroFile::NitroFile(int id, int begOffs, int endOffs, NitroFilesystem* parent, NitroFile* allocFile, bool fixedBeg, bool fixedEnd, bool endsize, string name)
 {
@@ -151,10 +152,10 @@ void NitroFile::replaceContents(void* ptr, int nsize)
     iprintf("Replacing: ");
     print();
     int newOffs = begOffs;
-    if(size <  nsize)
+    if(size < nsize)
     {
-        int newOffs = parent->findFreeSpace(size);
-        iprintf("%x -> %x", size, newOffs);
+        newOffs = parent->findFreeSpace(nsize);
+        iprintf("%x -> %x\n", nsize, newOffs);
     }
 
     begOffs = newOffs;
@@ -353,7 +354,7 @@ NitroFilesystem::NitroFilesystem(const char* fn)
 
 int NitroFilesystem::findFreeSpace(int len)
 {
-    allFiles.sort(); //sort by offset
+    allFiles.sort(smaller); //sort by offset
     
     for (list<NitroFile*>::iterator it = allFiles.begin(); it != allFiles.end(); it++)
     {
@@ -376,7 +377,8 @@ int NitroFilesystem::findFreeSpace(int len)
             if(spBegin >= 0x1400000)
                 return spBegin;
     }
-
+    iprintf("LAST FILE: ");
+    allFiles.back()->print();
     int lastFile = allFiles.back()->endOffs + 1;
     if (lastFile % 4 != 0)
         lastFile += 4 - lastFile % 4;
@@ -389,6 +391,12 @@ int NitroFilesystem::findFreeSpace(int len)
 
 void NitroFilesystem::flushCache()
 {
+    allFiles.sort(smaller); //sort by offset
+    NitroFile* lastFile = allFiles.back();
+    uint lastOffs = lastFile->endOffs + 0x10;
+    lastOffs &= ~3;
+    getFileByName("fat.bin")->setUintAt(0x80, lastOffs);
+    
     for(list<NitroFile*>::iterator it = allFiles.begin(); it != allFiles.end(); it++)
         (*it)->flushCache();
 

@@ -16,18 +16,19 @@
 */
 
 
+#ifndef _UI_H
+#define _UI_H
 #include "editor.h"
 #include <nds.h>
 
 using namespace std;
 
-#ifndef _UI_H
-#define _UI_H
 
 extern bool uiOn;
 
 void uiShow();
 void uiHide();
+void renderUI();
 void uiTouchDown(int x, int y);
 
 #endif
