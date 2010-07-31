@@ -124,7 +124,7 @@ class NitroFile
     bool cacheModified;
     void enableCache();
     void flushCache();
-    
+    void fixHeaderChecksum();
     
     ~NitroFile();
 };

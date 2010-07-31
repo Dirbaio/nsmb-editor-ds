@@ -78,7 +78,8 @@ int main(void)
     iprintf("Loading OAM!\n");
 	loadOAM();
     iprintf("Loading Editor!\n");
-	loadEditor(0);
+    int level = showList(levelList);
+	loadEditor(levelFileList[level]);
 
 	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0x10, 0);
 	bgShow(2);

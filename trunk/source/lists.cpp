@@ -22,9 +22,13 @@
 vector<string> jyotyuAnnotationList;
 vector<string> spriteList;
 vector<string> tilesetList;
+vector<string> entranceList;
 vector<string> topBGList;
 vector<string> bottomBGList;
+vector<string> musicList;
 
+vector<string> levelList;
+vector<string> levelFileList;
 
 void loadList(const char* fname, vector<string>& v)
 {
@@ -49,7 +53,54 @@ void loadList(const char* fname, vector<string>& v)
     }
 }
 
+void loadLevelList(const char* fname)
+{
+    char mystring[100];
+    
+    iprintf("%s\n", fname);
+    FILE* f = fopen (fname, "rb");
+    
+    if (f == NULL) perror ("Error opening file");
+    else
+    {
+        while(!feof(f))
+        {
+            fgets (mystring , 100 ,f);
+            string s = mystring;
+            s = s.substr(0, s.size()-2);
+            int ind = s.find('|');
+            
+            string levname = s.substr(0, ind);
+            string fname = s.substr(ind+1, s.size() - ind - 3);
+            char areacount = s[s.size()-1];
+            
+//            iprintf("%s %s %c\n", levname.c_str(), fname.c_str(), areacount);
+           
+            if(areacount == '1' )
+            {
+                levelList.push_back(levname);
+                levelFileList.push_back(fname+"_1");
+            }
+            else
+            {
+                for(char c = '1'; c <= areacount; c++)
+                {
+                levelList.push_back(levname+" Area "+c);
+                levelFileList.push_back(fname+"_"+c);
+                }
+            }
+//            levelList.push_back());
+        }
+        fclose (f);
+    }
+}
+
 void loadLists()
 {
     loadList("sprlist.txt", spriteList);
+    loadList("tbglist.txt", topBGList);
+    loadList("bbglist.txt", bottomBGList);
+    loadList("muslist.txt", musicList);
+    loadList("entlist.txt", entranceList);
+    loadLevelList("levellist.txt");
 }
