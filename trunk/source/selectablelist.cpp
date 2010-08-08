@@ -18,6 +18,7 @@
 #include "selectablelist.h"
 #include "font.h"
 #include "rom.h"
+#include "text.h"
 
 vector<string> lsts;
 
@@ -40,28 +41,10 @@ void desmumePrint(const char* s)
     return;
     *((vu32*)0x04FFF010) = (u32)s;
 }
-void renderText(int x, int y, uint max, int col, string& s)
-{
-   	uint16* bg0ptr=  (uint16*)0x0601E000;
-    x %= 32;
-    y %= 32;
-    bg0ptr += x + y*32;
-    for(uint i = 0; i < max; i++)
-    {
-        char c = ' ';
-        if(i < s.size()) c = s[i];
-        *bg0ptr = c | col << 12;
-
-        bg0ptr++;
-    }
-}
 
 void renderList(int y0)
 {
-   	uint16* bg0ptr=  (uint16*)0x0601E000;
-    for(uint i = 0; i < 32*32; i++)
-        bg0ptr[i] = 0;
-    
+    textClearOpaque();
     for(int y = y0; y <= y0 + 25; y++)
     {
         if(y < 0) continue;
@@ -83,49 +66,49 @@ int showList(vector<string>& lst, int inisel)
 {
     selection = inisel;
     lsts = lst;
-    scrolly = 0;
+    scrolly = inisel * 8 - 50;
+    if(scrolly < -10) scrolly = -10;
+    if(scrolly > lst.size() * 8 + 10) scrolly = lst.size() * 8 + 10;
     speedy = 0;
-    selection = 0;
+    selection = inisel;
     selecting = true;
-	bgInit(0, BgType_Text8bpp, BgSize_T_256x256, 0x1C, 5);
-    bgShow(0);
-	cpuCopy16(&fontTiles, (uint16*)0x06014000, fontTilesLen);
 
-	vramSetBankE(VRAM_E_LCD);
-    
-    //Normal text
-    VRAM_E_EXT_PALETTE[0][0][1] = RGB15(0, 0, 0); //FG
-    VRAM_E_EXT_PALETTE[0][0][2] = RGB15(31, 31, 31); //BG
-
-    //selected text
-    VRAM_E_EXT_PALETTE[0][1][1] = RGB15(31, 31, 31); //FG
-    VRAM_E_EXT_PALETTE[0][1][2] = RGB15(0, 0, 31); //BG
-    
-	vramSetBankE(VRAM_E_BG_EXT_PALETTE);
-    renderList(0);
+    speedy = 0.1;
 //    renderText(1, 4, 8, 1, "HELLO WORLD");
 //iprintf("aaaa");
+
+    bool touchvalid = false;
     while(selecting)
     {        
+        scanKeys();
+        touchRead(&touch);
+        keysNowPressed = keysDownRepeat();
+        keysNowHeld = keysHeld();
+
         if(keysNowHeld & KEY_TOUCH)
         {
-            float ytouchnow = scrolly + (float)touch.py;
-            if(lastTouchPress )
+            if(touchvalid)
             {
-                float diff = ytouchnow - touchy;
-           
-//                printf("%4.2f\n", diff);
-                speedy -= diff / 10;
-            }
-            else
-            {
-                touchy = ytouchnow;
-                selection = (int)(touchy/8);
-                if(selection < 0) selection = 0;
-                if(selection >= lsts.size()) selection = lsts.size()-1;
-//                iprintf("%d\n", selection);
+                float ytouchnow = scrolly + (float)touch.py;
+                if(lastTouchPress )
+                {
+                    float diff = ytouchnow - touchy;
+               
+    //                printf("%4.2f\n", diff);
+                    speedy -= diff / 10;
+                }
+                else
+                {
+                    touchy = ytouchnow;
+                    selection = (int)(touchy/8);
+                    if(selection < 0) selection = 0;
+                    if(selection >= lsts.size()) selection = lsts.size()-1;
+    //                iprintf("%d\n", selection);
+                }
             }
         }
+        else
+            touchvalid = true;
         
         if(keysNowHeld & KEY_TOUCH)
             speedy *= 0.7d;
@@ -158,21 +141,15 @@ int showList(vector<string>& lst, int inisel)
         if(speedy != 0)
         {
             scrolly += speedy;
-            bgSetScroll(0, 0, (int)(scrolly));
-            bgUpdate();
+            textScroll((int)(scrolly));
             renderList((int)(scrolly/8));
-            
         }
             
         lastTouchPress = (keysNowHeld & KEY_TOUCH) != 0;
-        scanKeys();
-        touchRead(&touch);
-        keysNowPressed = keysDownRepeat();
-        keysNowHeld = keysHeld();
         if(keysNowPressed & KEY_RIGHT)
             selecting = false;
         swiWaitForVBlank();
     }
-    bgHide(0);
+    textClearTransparent();
     return selection;
 }

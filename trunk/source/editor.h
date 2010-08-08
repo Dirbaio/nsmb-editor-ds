@@ -21,11 +21,10 @@
 
 #include<nds.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>
+#include <string>
 
+#include "lists.h"
+#include "selectableList.h"
 #include "level.h"
 #include "levelrendering.h"
 #include "ui.h"
@@ -54,5 +53,6 @@ void editorTouchMoved(uint x, uint y);
 void saveEditor();
 void editorRenderSprites();
 void editorDeleteObjects();
-
+void editorShowPalette();
+void editorShowProperties();
 #endif

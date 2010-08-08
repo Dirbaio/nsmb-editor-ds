@@ -1,0 +1,100 @@
+World 1-1|A01|3
+World 1-2|A02|3
+World 1-3|A03|1
+W1 Tower|A07|3
+World 1-4|A04|3
+World 1-5|A05|2
+W1 Castle|A08|3
+World 1-A|A06|2
+Cannon (W1 to W5)|A09|1
+World 2-1|B01|3
+World 2-2|B02|2
+World 2-3|B03|2
+World 2-4|B04|2
+W2 Tower|B08|3
+World 2-5|B05|2
+World 2-6|B06|2
+W2 Castle|B09|3
+World 2-A|B07|3
+Cannon (W2 to W5)|B10|1
+World 3-1|C01|2
+World 3-2|C02|2
+W3 Tower|C08|2
+World 3-3|C03|3
+W3 Ghost House|C07|3
+W3 Castle|C09|2
+World 3-A|C04|3
+World 3-B|C05|2
+World 3-C|C06|2
+Cannon (W3 to W6)|C10|1
+World 4-1|D01|1
+World 4-2|D02|2
+World 4-3|D03|2
+W4 Tower|D09|2
+World 4-4|D04|2
+W4 Ghost House|D08|3
+World 4-5|D05|3
+World 4-6|D06|2
+W4 Castle|D10|2
+World 4-A|D07|2
+Cannon (W4 to W7)|D11|1
+World 5-1|E01|1
+World 5-2|E02|2
+W5 Tower|E09|2
+World 5-3|E03|2
+W5 Ghost House|E08|3
+World 5-4|E04|1
+W5 Castle|E10|2
+World 5-A|E05|2
+World 5-B|E06|1
+World 5-C|E07|2
+Cannon (W5 to W8)|E11|1
+World 6-1|F01|2
+World 6-2|F02|2
+W6 Tower 1|F09|2
+World 6-3|F03|2
+World 6-4|F04|1
+W6 Tower 2|F10|2
+World 6-5|F05|2
+World 6-6|F06|3
+W6 Castle|F11|2
+World 6-A|F07|2
+World 6-B|F08|1
+Unused Cannon (W6 to W8)|F12|1
+World 7-1|G01|1
+W7 Ghost House|G09|3
+World 7-2|G02|2
+World 7-3|G03|2
+W7 Tower|G10|2
+World 7-4|G04|1
+World 7-5|G05|3
+World 7-6|G06|3
+World 7-7|G07|1
+World 7-A|G08|2
+W7 Castle|G11|2
+World 8-1|H01|2
+World 8-2|H02|3
+W8 Tower 1|H09|2
+World 8-3|H03|2
+World 8-4|H04|2
+W8 Castle|H11|2
+World 8-5|H05|2
+World 8-6|H06|2
+World 8-7|H07|1
+World 8-8|H08|2
+W8 Tower 2|H10|2
+W8 Final Castle|H12|3
+1-Up Bonus Game|I01|1
+Item Bonus Game|I02|1
+Mega Mushroom Bonus Game|I03|1
+Bottom Screen Background Chooser|I04|1
+MvsL - SMB 1-1|J01|1
+MvsL - Underground|J02|1
+MvsL - Ice World|J03|1
+MvsL - Pipe World|J04|1
+MvsL - Castle|J05|1
+Unused Level 1|J06|1
+Unused Level 2|J07|1
+Unused Level 3|J08|1
+Unused Level 4|J09|1
+Unused Level 5|J10|1

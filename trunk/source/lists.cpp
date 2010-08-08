@@ -39,7 +39,11 @@ void loadList(const char* fname, vector<string>& v)
     iprintf("%s\n", fname);
     FILE* f = fopen (fname, "rb");
     
-    if (f == NULL) perror ("Error opening file");
+    if (f == NULL)
+    {
+        perror ("Error opening file");
+        while(1);
+    }
     else
     {
         while(!feof(f))
@@ -60,7 +64,11 @@ void loadLevelList(const char* fname)
     iprintf("%s\n", fname);
     FILE* f = fopen (fname, "rb");
     
-    if (f == NULL) perror ("Error opening file");
+    if (f == NULL)
+    {
+        perror ("Error opening file");
+        while(1);
+    }
     else
     {
         while(!feof(f))
@@ -84,7 +92,7 @@ void loadLevelList(const char* fname)
             else
             {
                 for(char c = '1'; c <= areacount; c++)
-                {
+                { 
                 levelList.push_back(levname+" Area "+c);
                 levelFileList.push_back(fname+"_"+c);
                 }

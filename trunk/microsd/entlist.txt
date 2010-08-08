@@ -1,0 +1,26 @@
+ 0: Normal
+ 1: Unused
+ 2: Door
+ 3: Pipe facing up 
+ 4: Pipe facing down
+ 5: Pipe facing left
+ 6: Pipe facing right
+ 7: Unused
+ 8: Ground pound (entrance only)
+ 9: Sliding (entrance only)
+10: Swimming (entrance only)
+11: Unused
+12: Unused
+13: Unused
+14: Unused
+15: Unused
+16: Mini pipe facing up
+17: Mini pipe facing down
+18: Mini pipe facing left
+19: Mini pipe facing right
+20: Jumping (entrance only)
+21: Climbing vine (entrance only)
+22: Unknown 1
+23: Unknown 2
+24: Unknown 3
+25: Unknown 4
