@@ -1,0 +1,52 @@
+00: None
+01: Tower
+02: Starman
+03: Mega Mario
+04: End of Level
+05: Death
+06: Desert
+07: Bowser Jr. Battle
+08: VS Lose
+09: Underground
+0A: Bonus room
+0B: Underwater
+0C: Lava
+0D: End of Game
+0E: Beach
+0F: Boss
+10: Ghost House
+11: Castle
+12: Timer
+13: End of Game Fanfare
+14: Game Over
+15: Final Boss
+16: Boss Beaten
+18: Mushrooms
+19: Toad House
+1A: Grassland
+1B: Title Screen
+1C: SMB End of Level
+1D: Toad House Fanfare
+1E: Multiplayer
+1F: Title Screen
+20: ??
+21: ??
+22: ??
+50: Bowser boss ambient noise
+51: Mummy-pokey boss ambient noise
+52: Big cheep-cheep ambient noise
+53: World 4 piranha plant ambient noise
+56: Lakithunder anbient noise
+63: Grassland (Alt)
+64: World 1
+65: World 2
+66: World 3
+67: World 4
+68: World 5
+69: World 6
+6A: World 7
+6B: World 8
+6C: Ending
+6D: Intro 1
+6E: Intro 2
+6F: Peach Fanfare

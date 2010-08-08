@@ -27,14 +27,11 @@ bool uiOn = false;
 #define BTN_SAVE 0
 #define BTN_SCROLL 1
 #define BTN_MOVE 2
-#define BTN_RESIZE 2
+#define BTN_RESIZE 6
 #define BTN_DELETE 3
 #define BTN_CLONE 4
 #define BTN_PALETTE 5
-#define BTN_OBJECT 6
-#define BTN_ENTRANCE 7
-#define BTN_PATH 8
-#define BTN_PROGPATH 9
+#define BTN_PROPERTIES 8
 #define BTN_VIEW 10
 #define BTN_ZONE 11
 #define BTN_EMPTY 17
@@ -76,14 +73,10 @@ void renderUI()
 	renderButton(4, BTN_RESIZE, editAction == EDITACTION_RESIZE);
 	renderButton(5, BTN_CLONE, editAction == EDITACTION_CLONE);
 	
-	renderButton(7, BTN_OBJECT, editMode == EDITMODE_OBJECTS);
-	renderButton(8, BTN_ENTRANCE, editMode == EDITMODE_ENTRANCES);
-	renderButton(9, BTN_PATH, editMode == EDITMODE_PATHS);
-	renderButton(10, BTN_PROGPATH, editMode == EDITMODE_PROGPATHS);
-	renderButton(11, BTN_VIEW, editMode == EDITMODE_VIEWS);
-	renderButton(12, BTN_ZONE, editMode == EDITMODE_ZONES);
+	renderButton(7, BTN_DELETE, false);
 	
-	renderButton(14, BTN_PALETTE, paletteOn);
+	renderButton(13, BTN_PROPERTIES, false);
+	renderButton(14, BTN_PALETTE, false);
 }
 
 void uiShow()
@@ -118,13 +111,10 @@ void uiTouchDown(int x, int y)
 		case 3: editAction = EDITACTION_MOVE  ; break;
 		case 4: editAction = EDITACTION_RESIZE; break;
 		case 5: editAction = EDITACTION_CLONE ; break;
-		
-		case 7 : editMode  = EDITMODE_OBJECTS  ; break;
-		case 8 : editMode  = EDITMODE_ENTRANCES; break;
-		case 9 : editMode  = EDITMODE_PATHS    ; break;
-		case 10: editMode  = EDITMODE_PROGPATHS; break;
-		case 11: editMode  = EDITMODE_VIEWS    ; break;
-		case 12: editorDeleteObjects(); break;
+       
+		case 7: editorDeleteObjects(); break;
+		case 13: editorShowProperties(); break;
+		case 14: editorShowPalette(); break;
 	}
 	
 	renderUI();

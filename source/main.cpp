@@ -34,7 +34,7 @@
 
 #include "selectablelist.h"
 #include "lists.h"
-#include "nitrofs.h"
+#include "text.h"
 
 #define mapxy(x, y) map[x+y*32]
 
@@ -68,6 +68,7 @@ int main(void)
     
     
     loadLists();
+    textInit();
     
 //    showList(spriteList);
 

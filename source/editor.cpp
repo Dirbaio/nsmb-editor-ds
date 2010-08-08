@@ -17,6 +17,8 @@
 
 
 #include "editor.h"
+#include "text.h"
+#include "spritedataeditor.h"
 
 uint editMode = EDITMODE_OBJECTS;
 uint editAction = EDITACTION_SCROLL;
@@ -116,6 +118,8 @@ void doSelection(uint x, uint y)
 	
 	unselectAll();
 	
+    textClearTransparent();
+    textScroll(0);
 	if(elemAtCursor == NULL)
 	{
 		multiSelecting = true;
@@ -127,6 +131,12 @@ void doSelection(uint x, uint y)
 	else
 	{
 		elemAtCursor->selected = true;
+        for(list<LevelSprite>::iterator it = sprites.begin(); it != sprites.end(); it++)
+            if(it->selected)
+            {
+                renderText(0, 2, 32, 0, spriteList[it->spriteNum]);
+            }
+            
 	}
 }
 
@@ -307,4 +317,40 @@ void editorDeleteObjects()
             i2++;
     }
 	repaintScreen();
+}
+
+void editObjectNumber(LevelObject& o)
+{
+}
+void editSpriteNumber(LevelSprite& s)
+{
+    s.spriteNum = showList(spriteList, s.spriteNum);
+}
+
+void editorShowPalette()
+{
+    for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); i++)
+        if(i->selected)
+        {
+            editObjectNumber(*i);
+            return;
+        }
+        
+    for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); i++)
+        if(i->selected)
+        {
+            editSpriteNumber(*i);
+            return;
+        }
+}
+
+void editorShowProperties()
+{
+    for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); i++)
+        if(i->selected)
+        {
+            editSpriteNumber(*i);
+            return;
+        }
+    
 }
