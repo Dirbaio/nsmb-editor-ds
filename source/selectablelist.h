@@ -15,11 +15,42 @@
 *   along with NSMB Editor DS.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef _SELECTABLELIST_H
+#define _SELECTABLELIST_H
+
 #include<nds.h>
 #include<vector>
 #include<string>
 
 using namespace std;
 
-int showList(vector<string>& lst);
-int showList(vector<string>& lst, int selection);
+class SelectableList
+{
+    public: 
+    
+    bool selecting;
+    float scrolly, speedy;
+    int selection;
+    touchPosition touch;
+    u32 keysNowPressed, keysNowHeld;
+    u32 dblTouchTime; //time since last touch
+    float touchy; //y position being touched
+    bool lastTouchPress;
+
+    SelectableList();
+    void render();
+    void show();
+    void select(int ind);
+    
+    virtual int getObjCount();
+    virtual int getObjsPerRow();
+    virtual int getObjHeight();
+    virtual void renderObj(int ind, bool selected);
+    virtual void scrollList(int y);
+    virtual void objSelected(int ind);
+    virtual void keyPressed(u32 mask);
+    
+    int getListHeight();
+};
+
+#endif

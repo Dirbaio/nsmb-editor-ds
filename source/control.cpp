@@ -41,12 +41,12 @@ void checkControls()
 			if(penOverUI)
 				uiTouchDown(touch.px, touch.py);
 			else
-				editorTouchDown(touch.px, touch.py);
+				editor->touchDown(touch.px, touch.py);
 		}
 
 		if(touch.px != lasttx || touch.py != lastty)
 			if(!penOverUI)
-				editorTouchMoved(touch.px, touch.py);
+				editor->touchMoved(touch.px, touch.py);
 
 		lasttx = touch.px;
 		lastty = touch.py;

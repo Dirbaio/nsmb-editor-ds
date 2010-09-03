@@ -22,12 +22,8 @@
 #include<nds.h>
 
 #include <string>
-
-#include "lists.h"
-#include "selectableList.h"
 #include "level.h"
-#include "levelrendering.h"
-#include "ui.h"
+
 
 using namespace std;
 
@@ -44,15 +40,59 @@ using namespace std;
 #define EDITMODE_VIEWS     (4)
 #define EDITMODE_ZONES     (5)
 
-extern uint editMode;
-extern uint editAction;
+class LevelEditor;
 
-void loadEditor(string level);
-void editorTouchDown(uint x, uint y);
-void editorTouchMoved(uint x, uint y);
-void saveEditor();
-void editorRenderSprites();
-void editorDeleteObjects();
-void editorShowPalette();
-void editorShowProperties();
+extern LevelEditor* editor;
+
+class LevelEditor
+{
+    public:
+    u32 editAction;
+    Level* l;
+
+    uint touchx, touchy;
+    int levelx;
+    int levely;
+
+    bool multiSelecting ;
+    int multiSelectX, multiSelectY;
+    int multiSelectXb, multiSelectYb;
+
+
+    uint tx, ty; //Position touched now, relative to level
+    uint ltx, lty; //Position touched on last frame.
+    uint lax, lay; //Last position relative to screen
+    int selMult; //Global sizeMultiplier of all the selected stuff
+
+    bool resizeLeft;
+    bool resizeTop;
+
+
+    LevelEditor(string level);
+    ~LevelEditor();
+    void repaintScreen();
+    void updateScroll();
+    void touchDown(u32 x, u32 y);
+    void touchMoved(u32 x, u32 y);
+    void save();
+    void renderSprites();
+    void deleteObjects();
+    void showPalette();
+    void showProperties();
+    
+    void unselectAll();
+    bool elementInMultiRect(LevelElement& obj);
+    bool elementAtPos(LevelElement& e, int x, int y);
+    LevelElement* getElementAtPos(int x, int y);
+    void doSelection(uint x, uint y);
+    void doMultiSelection();
+    void doAction(LevelElement& e);
+    int countSelectedObjects();
+    template<class T>
+    void doMultiSelectionInList(list<T>& lst);
+
+};
+
 #endif
+
+

@@ -68,10 +68,10 @@ void renderUI()
 	
 	renderButton(0, BTN_SAVE, saving);
 	
-	renderButton(2, BTN_SCROLL, editAction == EDITACTION_SCROLL);
-	renderButton(3, BTN_MOVE, editAction == EDITACTION_MOVE);
-	renderButton(4, BTN_RESIZE, editAction == EDITACTION_RESIZE);
-	renderButton(5, BTN_CLONE, editAction == EDITACTION_CLONE);
+	renderButton(2, BTN_SCROLL, editor->editAction == EDITACTION_SCROLL);
+	renderButton(3, BTN_MOVE, editor->editAction == EDITACTION_MOVE);
+	renderButton(4, BTN_RESIZE, editor->editAction == EDITACTION_RESIZE);
+	renderButton(5, BTN_CLONE, editor->editAction == EDITACTION_CLONE);
 	
 	renderButton(7, BTN_DELETE, false);
 	
@@ -106,15 +106,15 @@ void uiTouchDown(int x, int y)
 	
 	switch(bx)
 	{
-		case 0: saveEditor(); break;
-		case 2: editAction = EDITACTION_SCROLL; break;
-		case 3: editAction = EDITACTION_MOVE  ; break;
-		case 4: editAction = EDITACTION_RESIZE; break;
-		case 5: editAction = EDITACTION_CLONE ; break;
+		case 0:  editor->save(); break;
+		case 2:  editor->editAction = EDITACTION_SCROLL; break;
+		case 3:  editor->editAction = EDITACTION_MOVE  ; break;
+		case 4:  editor->editAction = EDITACTION_RESIZE; break;
+		case 5:  editor->editAction = EDITACTION_CLONE ; break;
        
-		case 7: editorDeleteObjects(); break;
-		case 13: editorShowProperties(); break;
-		case 14: editorShowPalette(); break;
+		case 7:  editor->deleteObjects(); break;
+		case 13:  editor->showProperties(); break;
+		case 14:  editor->showPalette(); break;
 	}
 	
 	renderUI();

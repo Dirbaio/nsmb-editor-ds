@@ -545,6 +545,7 @@ const uint16 map16ExtraData[256][4] =
 };
 
 objPointer *objectIndex[3];
+int objectCount[3];
 uint8 *objectDefinitions[3];
 uint16 map16Data [TOTAL_MAP16][4];
 
@@ -601,16 +602,20 @@ void loadTilesets(int tileset)
         ->loadContentsInto(&map16Data[MAP16_PAGE*4]);
 	
 	//Load the Object Indexes!!!
-	objectIndex[0] = (objPointer*) 
-        fs->getFileById(jyoytu_unt_hd_fileID[region])
-            ->getContents();
-	objectIndex[1] = (objPointer*) 
-        fs->getFileById(getFileIDFromTable(Table_TS_UNT_HD, tileset))
-            ->getContents();
-	objectIndex[2] = (objPointer*) 
-        fs->getFileById(subnohara_unt_hd_fileID[region])
-            ->getContents();
-
+	NitroFile* indFile;
+	
+	indFile = fs->getFileById(jyoytu_unt_hd_fileID[region]);
+	objectCount[0] = indFile->size / 32;
+	objectIndex[0] = (objPointer*) indFile->getContents();
+	
+	indFile = fs->getFileById(getFileIDFromTable(Table_TS_UNT_HD, tileset));
+	objectCount[1] = indFile->size / 32;
+	objectIndex[1] = (objPointer*) indFile->getContents();
+	
+	indFile = fs->getFileById(subnohara_unt_hd_fileID[region]);
+	objectCount[2] = indFile->size / 32;
+	objectIndex[2] = (objPointer*) indFile->getContents();
+	
 	//Load the Object Files!!!
 	objectDefinitions[0] = 
         fs->getFileById(jyoytu_unt_fileID[region])

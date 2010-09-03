@@ -18,7 +18,7 @@
 
 #include "levelrendering.h"
 
-uint xMin, xMax, yMin, yMax;
+int xMin, xMax, yMin, yMax;
 bool renderingSelected;
 
 uint16 *bg2ptr;
@@ -26,14 +26,15 @@ uint16 *bg3ptr;
 
 bool onScreen(const LevelElement& obj)
 {
-	if(obj.x > xMax) return false;
-	if(obj.y > yMax) return false;
-	if(obj.x + obj.tx < xMin) return false;
-	if(obj.y + obj.ty < yMin) return false;
+    int m = obj.getSizeMultiplier();
+	if(obj.x * m > xMax) return false;
+	if(obj.y * m > yMax) return false;
+	if(obj.x * m + obj.tx * m < xMin) return false;
+	if(obj.y * m + obj.ty * m < yMin) return false;
 	return true;
 }
 
-inline void setTileXY(uint x, uint y, uint16 tile)
+inline void setTileXY(int x, int y, uint16 tile)
 {
 	if(renderingSelected)
 		tile |= 1<<15;
@@ -41,27 +42,27 @@ inline void setTileXY(uint x, uint y, uint16 tile)
 	
 }
 
-inline void setTileXYb(uint x, uint y, uint16 tile)
+inline void setTileXYb(int x, int y, uint16 tile)
 {
 	if(renderingSelected)
 		tile |= 1<<15;
 	bg3ptr[(x%64) + (y%64)*64] = tile;
 }
 
-inline uint16 getTileXY(uint x, uint y)
+inline uint16 getTileXY(int x, int y)
 {
 	return bg2ptr[(x%64) + (y%64)*64];	
 }
 
-inline uint16 getTileXYb(uint x, uint y)
+inline uint16 getTileXYb(int x, int y)
 {
 	return bg3ptr[(x%64) + (y%64)*64];
 }
 
-inline void setMap16TileXY(uint x, uint y, uint16 tile)
+inline void setMap16TileXY(int x, int y, uint16 tile)
 {
-	if(x < xMin || x > xMax) return;
-	if(y < yMin || y > yMax) return;
+	if(x < xMin / 16 || x > xMax / 16) return;
+	if(y < yMin / 18 || y > yMax / 16) return;
 	setTileXY(x*2,   y*2,   map16Data[tile][0]);
 	setTileXY(x*2+1, y*2,   map16Data[tile][1]);
 	setTileXY(x*2,   y*2+1, map16Data[tile][2]);
@@ -109,16 +110,16 @@ bool skipRow(uint8* obj, uint& pos)
 	return obj[pos] == 0xFF;
 }
 
-void renderTile(uint8* obj, uint& pos, uint xp, uint yp)
+void renderTile(uint8* obj, uint& pos, int xp, int yp)
 {
 	uint8 trash;
 	setMap16TileXY(xp, yp, readTile(obj, pos, trash));
 }
 
-void putArray(uint8 *obj, uint xp, uint yp, uint w, uint h, uint x, uint y, bool& put)
+void putArray(uint8 *obj, int xp, int yp, int w, int h, int x, int y, bool& put)
 {
 
-	uint xo = x;
+	int xo = x;
 	uint pos = 0;
 	uint8 trash;
 	
@@ -132,7 +133,7 @@ void putArray(uint8 *obj, uint xp, uint yp, uint w, uint h, uint x, uint y, bool
 		}
 		else
 		{
-			if(x < w && y < h)
+			if(x < w && y < h && x >= 0 && y >= 0)
 			{
 				setMap16TileXY(x+xp, y+yp, tile);
 				put = true;
@@ -141,11 +142,11 @@ void putArray(uint8 *obj, uint xp, uint yp, uint w, uint h, uint x, uint y, bool
 		}
 	}
 }
-
-void renderSlopeObject(uint8* obj, uint xp, uint yp, uint w, uint h)
+ 
+void renderSlopeObject(uint8* obj, int xp, int yp, int w, int h)
 {
 	uint pos = 1; // Skip the slope control
-	uint slopeSectionWidth = 0;
+	int slopeSectionWidth = 0;
 	uint8 controlByte = 0;
 	while(obj[pos] != 0xFE)
 	{
@@ -154,7 +155,7 @@ void renderSlopeObject(uint8* obj, uint xp, uint yp, uint w, uint h)
 	}
 	pos++;
 	
-	uint slopeSectionHeight = 1;
+	int slopeSectionHeight = 1;
 	
 	while(!(obj[pos] & 0x80))
 	{
@@ -164,8 +165,8 @@ void renderSlopeObject(uint8* obj, uint xp, uint yp, uint w, uint h)
 	
 	bool hasSubSection = obj[pos] == 0x85;
 	uint subSectionPos = pos+1;
-	uint subSectionHeight = 1;
-	uint subSectionWidth = 0;
+	int subSectionHeight = 1;
+	int subSectionWidth = 0;
 	if(hasSubSection)
 	{
 		pos++; // Skip the slope control
@@ -232,17 +233,17 @@ void renderSlopeObject(uint8* obj, uint xp, uint yp, uint w, uint h)
 	}	
 }
 
-void renderRow(uint8* obj, uint& pos, uint xp, uint yp, uint w)
+void renderRow(uint8* obj, uint& pos, int xp, int yp, int w)
 {
 
 	uint posBegin = pos;
 	//First off, let's see what repeats we have...
-	uint tilesBeforeRepeat = 0;
-	uint tilesInRepeat = 0;
+	int tilesBeforeRepeat = 0;
+	int tilesInRepeat = 0;
 	uint posBeforeRepeat = pos;
 	uint posAfterRepeat = pos;
-	uint tilesAfterRepeat = 0;
-	uint totalTiles;
+	int tilesAfterRepeat = 0;
+	int totalTiles;
 	
 	uint8 trash;
 	
@@ -281,13 +282,13 @@ void renderRow(uint8* obj, uint& pos, uint xp, uint yp, uint w)
 	
 	pos = posBegin;
 	
-	for(uint i = 0; i < min(tilesBeforeRepeat, w); i++)
+	for(int i = 0; i < min(tilesBeforeRepeat, w); i++)
 	{
 		renderTile(obj, pos, xp+i, yp);
 	}
 	
 	int tilesUntilRepeat = 0;
-	for(uint i = 0; i + tilesBeforeRepeat + tilesAfterRepeat < w; i++)
+	for(int i = 0; i + tilesBeforeRepeat + tilesAfterRepeat < w; i++)
 	{
 		if(tilesUntilRepeat == 0)
 		{
@@ -299,7 +300,7 @@ void renderRow(uint8* obj, uint& pos, uint xp, uint yp, uint w)
 	}
 	
 	pos = posAfterRepeat;
-	for(uint i = 0; i < min(tilesAfterRepeat, w); i++)
+	for(int i = 0; i < min(tilesAfterRepeat, w); i++)
 	{
 		renderTile(obj, pos, xp+w-tilesAfterRepeat+i, yp);
 	}
@@ -308,16 +309,16 @@ void renderRow(uint8* obj, uint& pos, uint xp, uint yp, uint w)
 	skipRow(obj, pos);
 }
 
-void renderStdObject(uint8* obj, uint xp, uint yp, uint w, uint h)
+void renderStdObject(uint8* obj, int xp, int yp, int w, int h)
 {
 	uint pos = 0;
 	//First off, let's see what repeats we have...
-	uint tilesBeforeRepeat = 0;
-	uint tilesInRepeat = 0;
+	int tilesBeforeRepeat = 0;
+	int tilesInRepeat = 0;
 	uint posBeforeRepeat = 0;
 	uint posAfterRepeat = 0;
-	uint tilesAfterRepeat = 0;
-	uint totalTiles;
+	int tilesAfterRepeat = 0;
+	int totalTiles;
 	
 	
 	//Section Before Repeat / Or the whole object if it has no repeats
@@ -355,13 +356,13 @@ void renderStdObject(uint8* obj, uint xp, uint yp, uint w, uint h)
 	
 	pos = 0;
 	
-	for(uint i = 0; i < min(tilesBeforeRepeat, h); i++)
+	for(int i = 0; i < min(tilesBeforeRepeat, h); i++)
 	{
 		renderRow(obj, pos, xp, yp+i, w);
 	}
 	
 	int tilesUntilRepeat = 0;
-	for(uint i = 0; i + tilesBeforeRepeat + tilesAfterRepeat < h; i++)
+	for(int i = 0; i + tilesBeforeRepeat + tilesAfterRepeat < h; i++)
 	{
 		if(tilesUntilRepeat == 0)
 		{
@@ -373,14 +374,14 @@ void renderStdObject(uint8* obj, uint xp, uint yp, uint w, uint h)
 	}
 	
 	pos = posAfterRepeat;
-	for(uint i = 0; i < min(tilesAfterRepeat, h); i++)
+	for(int i = 0; i < min(tilesAfterRepeat, h); i++)
 	{
 		renderRow(obj, pos, xp, yp+h-tilesAfterRepeat+i, w);
 	}
 	
 }
 
-void renderObject(uint objNum, uint tilesetNum, uint xp, uint yp, uint w, uint h)
+void renderObject(uint objNum, uint tilesetNum, int xp, int yp, int w, int h)
 {
 
 	uint8* obj = objectDefinitions[tilesetNum] + objectIndex[tilesetNum][objNum].offs;
@@ -395,21 +396,19 @@ void renderObject(uint objNum, uint tilesetNum, uint xp, uint yp, uint w, uint h
 }
 
 
-void renderLevelSprites(uint xMins, uint xMaxs, uint yMins, uint yMaxs, uint xCam, uint yCam)
+void renderLevelSprites(Level* l, uint xMins, uint xMaxs, uint yMins, uint yMaxs, uint xCam, uint yCam)
 {
-	return;
-	
 	xMin = xMins;
 	yMin = yMins;
 	xMax = xMaxs;
 	yMax = yMaxs;
 	
-	for(list<LevelObject>::reverse_iterator i = objects.rbegin(); i != objects.rend(); ++i)
+	for(list<LevelEntrance>::reverse_iterator i = l->entrances.rbegin(); i != l->entrances.rend(); ++i)
 	{
+//	    iprintf("%d %d\n", i->x, i->y, i->tx, i->ty);
 		if(onScreen(*i))
 		{
-			renderRect((i->x-xCam)*16, (i->y-yCam)*16, 
-				i->tx*16, i->ty*16);
+		    renderSprite(i->x-xMin, i->y-yMin, SpriteSize_16x16, 0);
 		}
 	}
 }
@@ -455,9 +454,9 @@ void renderTileRect(int xx, int yy, int tx, int ty, int linetile)
 	}
 }
 
-void renderSprites()
+void renderSprites(Level* l)
 {
-	for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); ++i)
+	for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); ++i)
 	{
 		if(!onScreen(*i)) continue;
 		
@@ -477,7 +476,7 @@ void renderSprites()
 
 }
 
-void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
+void renderLevel(Level* l, int xMins, int xMaxs, int yMins, int yMaxs)
 {
     
 	bg2ptr = (uint16*)0x06018000;
@@ -490,8 +489,8 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 		
     
 	//Zero out the zone we're going to redraw...
-	for(uint x = xMin; x <= xMax; x++)
-		for(uint y = yMin; y <= yMax; y++)
+	for(int x = xMin/16; x <= xMax/16; x++)
+		for(int y = yMin/16; y <= yMax/16; y++)
 			setMap16TileXY(x, y, 0);
 
 /*
@@ -502,7 +501,7 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 	
     
 
-	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
+	for(list<LevelObject>::iterator i = l->objects.begin(); i != l->objects.end(); ++i)
 	{
 
 		if(onScreen(*i))
@@ -519,7 +518,7 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 	
 	renderingSelected = false;
 	
-	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
+	for(list<LevelObject>::iterator i = l->objects.begin(); i != l->objects.end(); ++i)
 	{
 		if(onScreen(*i))
 		{
@@ -531,7 +530,7 @@ void renderLevel(uint xMins, uint xMaxs, uint yMins, uint yMaxs)
 	}
 
 	
-	renderSprites();
+	renderSprites(l);
 
 }
 

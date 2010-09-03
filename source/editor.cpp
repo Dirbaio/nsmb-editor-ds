@@ -18,58 +18,61 @@
 
 #include "editor.h"
 #include "text.h"
+#include "textlist.h"
 #include "spritedataeditor.h"
-
-uint editMode = EDITMODE_OBJECTS;
-uint editAction = EDITACTION_SCROLL;
-
-int levelx = 0;
-int levely = 0;
-
-bool multiSelecting = false;
-int multiSelectX, multiSelectY;
-int multiSelectXb, multiSelectYb;
+#include "lists.h"
+#include "selectablelist.h"
+#include "level.h"
+#include "levelrendering.h"
+#include "ui.h"
 
 
-uint tx, ty; //Position touched now, relative to level
-uint ltx, lty; //Position touched on last frame.
-uint lax, lay; //Last position relative to screen
-
-bool resizeLeft = false;
-bool resizeTop = false;
+LevelEditor* editor;
 
 
-
-
-void loadEditor(string lev)
+LevelEditor::LevelEditor(string lev)
 {
-	unloadLevel();
 	iprintf("Loading Editor. Level %s\n", lev.c_str());
-	loadLevel(lev);
+	l = new Level(lev);
 	iprintf("Level loaded. ");
 	levelx = 0;
 	levely = 0;
-	
+	editAction = EDITACTION_SCROLL;
+	multiSelecting = false;
 	bgSetScroll(2, levelx%512, levely%512);
 	bgSetScroll(3, levelx%512, levely%512);
-	renderLevel(levelx/16, levelx/16+16, levely/16, levely/16+12);
+	repaintScreen();
+	updateScroll();
 }
 
-uint touchx, touchy;
-
-void repaintScreen()
+LevelEditor::~LevelEditor()
 {
-	renderLevel(levelx/16, levelx/16+16, levely/16, levely/16+12);
+    delete l;
 }
 
-void unselectAll()
+void LevelEditor::updateScroll()
 {
-	for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
+	bgSetScroll(2, levelx%512, levely%512);
+	bgSetScroll(3, levelx%512, levely%512);
+
+	bgUpdate();
+}
+void LevelEditor::repaintScreen()
+{
+	renderLevel(l, levelx, levelx+256, levely, levely+192);
+}
+
+void LevelEditor::unselectAll()
+{
+	for(list<LevelObject>::iterator i = l->objects.begin(); i != l->objects.end(); ++i)
 		i->selected = false;
-	for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); ++i)
+	for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); ++i)
+		i->selected = false;
+	for(list<LevelEntrance>::iterator i = l->entrances.begin(); i != l->entrances.end(); ++i)
 		i->selected = false;
 }
-bool elementInMultiRect(LevelElement& obj)
+
+bool LevelEditor::elementInMultiRect(LevelElement& obj)
 {
 	int xMin = multiSelectX < multiSelectXb ? multiSelectX : multiSelectXb;
 	int xMax = multiSelectX > multiSelectXb ? multiSelectX : multiSelectXb;
@@ -84,7 +87,7 @@ bool elementInMultiRect(LevelElement& obj)
 	return true;
 }
 
-bool elementAtPos(LevelElement& e, int x, int y)
+bool LevelEditor::elementAtPos(LevelElement& e, int x, int y)
 {
 	int sizeMult = e.getSizeMultiplier();
 	if(e.x <= x/sizeMult && e.x + e.tx > x/sizeMult)
@@ -94,20 +97,24 @@ bool elementAtPos(LevelElement& e, int x, int y)
 	return false;
 }
 
-LevelElement* getElementAtPos(int x, int y)
+LevelElement* LevelEditor::getElementAtPos(int x, int y)
 {
-	for(list<LevelSprite>::reverse_iterator i = sprites.rbegin(); i!=sprites.rend(); ++i)
+	for(list<LevelEntrance>::reverse_iterator i = l->entrances.rbegin(); i!=l->entrances.rend(); ++i)
 		if(elementAtPos(*i, x, y))
 			return &(*i);
 
-	for(list<LevelObject>::reverse_iterator i = objects.rbegin(); i!=objects.rend(); ++i)
+	for(list<LevelSprite>::reverse_iterator i = l->sprites.rbegin(); i!=l->sprites.rend(); ++i)
+		if(elementAtPos(*i, x, y))
+			return &(*i);
+
+	for(list<LevelObject>::reverse_iterator i = l->objects.rbegin(); i!=l->objects.rend(); ++i)
 		if(elementAtPos(*i, x, y))
 			return &(*i);
 	
 	return NULL;
 }
 
-void doSelection(uint x, uint y)
+void LevelEditor::doSelection(uint x, uint y)
 {
 	LevelElement* elemAtCursor = getElementAtPos(x, y);
 	multiSelecting = false;
@@ -131,7 +138,9 @@ void doSelection(uint x, uint y)
 	else
 	{
 		elemAtCursor->selected = true;
-        for(list<LevelSprite>::iterator it = sprites.begin(); it != sprites.end(); it++)
+		selMult = elemAtCursor->getSizeMultiplier();
+		
+        for(list<LevelSprite>::iterator it = l->sprites.begin(); it != l->sprites.end(); it++)
             if(it->selected)
             {
                 renderText(0, 2, 32, 0, spriteList[it->spriteNum]);
@@ -140,7 +149,7 @@ void doSelection(uint x, uint y)
 	}
 }
 
-void editorTouchDown(uint x, uint y)
+void LevelEditor::touchDown(uint x, uint y)
 {
 	tx = x+levelx;
 	ty = y+levely;
@@ -157,35 +166,47 @@ void editorTouchDown(uint x, uint y)
 	lay = y;
 }
 
-void doMultiSelection()
+template<class T>
+void LevelEditor::doMultiSelectionInList(list<T>& lst)
 {
-	unselectAll();
-	for(list<LevelSprite>::reverse_iterator i = sprites.rbegin(); i!=sprites.rend(); ++i)
+	for(typename list<T>::reverse_iterator i = lst.rbegin(); i!=lst.rend(); ++i)
 		if(elementInMultiRect(*i))
+		{
 			i->selected = true;
-
-	for(list<LevelObject>::reverse_iterator i = objects.rbegin(); i!=objects.rend(); ++i)
-		if(elementInMultiRect(*i))
-			i->selected = true;
+			int mult = i->getSizeMultiplier();
+			if(mult > selMult)
+			    selMult = mult;
+	    }
 }
 
-void doAction(LevelElement& e)
+void LevelEditor::doMultiSelection()
+{
+	unselectAll();
+	selMult = 1;
+	doMultiSelectionInList(l->objects);
+	doMultiSelectionInList(l->sprites);
+	doMultiSelectionInList(l->entrances);
+}
+
+
+void LevelEditor::doAction(LevelElement& e)
 {
 	if(!e.selected) return;
 	
+	int dx = tx / selMult;
+	dx -= ltx / selMult;
+	int dy = ty / selMult;
+	dy -= lty / selMult;
+	
 	int mult = e.getSizeMultiplier();
-	int dx = tx / mult;
-	dx -= ltx / mult;
-	int dy = ty / mult;
-	dy -= lty / mult;
 	
 	if(editAction == EDITACTION_MOVE)
 	{
-		if(e.x + dx < 0) e.x = 0;
-		else e.x += dx;
-		
-		if(e.y + dy < 0) e.y = 0;
-		else e.y += dy;
+	    e.x += dx * selMult / mult;
+	    if(e.x < 0) e.x = 0;
+
+	    e.y += dy * selMult / mult;
+		if(e.y < 0) e.y = 0;
 	}
     
     if(editAction == EDITACTION_RESIZE)
@@ -205,26 +226,38 @@ void doAction(LevelElement& e)
     }
 }
 
-void editorTouchMoved(uint x, uint y)
+template<class T>
+void cloneSelected(list<T>& lst)
+{
+    int ocount = lst.size();
+    typename list<T>::iterator it = lst.begin();
+    for(int i = 0; i < ocount; i++)
+    {
+        if(it->selected)
+        {
+            lst.push_back(*it);
+            it->selected = false;
+        }
+        it++;
+    }
+}
+
+void LevelEditor::touchMoved(uint x, uint y)
 {
 	tx = x+levelx;
 	ty = y+levely;
 	
 	if(editAction == EDITACTION_SCROLL)
 	{
-		
-		levelx += lax;
-		levelx -= x;
-		levely += lay;
-		levely -= y;
+		int speed = 2;
+		levelx += lax*speed;
+		levelx -= x*speed;
+		levely += lay*speed;
+		levely -= y*speed;
 
 		if(levelx<0) levelx = 0;
 		if(levely<0) levely = 0;
-
-		bgSetScroll(2, levelx%512, levely%512);
-		bgSetScroll(3, levelx%512, levely%512);
-
-		bgUpdate();
+        updateScroll();
 	}
 	else if(multiSelecting)
 	{
@@ -234,37 +267,20 @@ void editorTouchMoved(uint x, uint y)
 	}
 	else if(editAction == EDITACTION_CLONE)
     {
-        int ocount = objects.size();
-        list<LevelObject>::iterator it = objects.begin();
-        for(int i = 0; i < ocount; i++)
-        {
-            if(it->selected)
-            {
-                objects.push_back(*it);
-                it->selected = false;
-            }
-            it++;
-        }
-
-        int scount = sprites.size();
-        list<LevelSprite>::iterator it2 = sprites.begin();
-        for(int i = 0; i < scount; i++)
-        {
-            if(it2->selected)
-            {
-                sprites.push_back(*it2);
-                it2->selected = false;
-            }
-            it2++;
-        }
+        cloneSelected(l->objects);
+        cloneSelected(l->sprites);
+        cloneSelected(l->entrances);
+        
         editAction = EDITACTION_MOVE;
         renderUI();
     }
     else
 	{
-		for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); ++i)
+		for(list<LevelObject>::iterator i = l->objects.begin(); i != l->objects.end(); ++i)
 			doAction(*i);
-		for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); ++i)
+		for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); ++i)
+			doAction(*i);
+		for(list<LevelEntrance>::iterator i = l->entrances.begin(); i != l->entrances.end(); ++i)
 			doAction(*i);
 	}
 	
@@ -275,81 +291,85 @@ void editorTouchMoved(uint x, uint y)
 	repaintScreen();
 }
 
-void editorRenderSprites()
+void LevelEditor::renderSprites()
 {
-	renderLevelSprites(levelx/16, levelx/16+16, levely/16, levely/16+12, levelx, levely);
+	renderLevelSprites(l, levelx, levelx+256, levely, levely+192, levelx, levely);
 }
 
-void saveEditor()
+void LevelEditor::save()
 {
-	saveLevel();
+	l->save();
 }
 
-void editorDeleteObjects()
+template<class T>
+void deleteSelected(list<T>& lst)
 {
-    list<LevelObject>::iterator i = objects.begin();
     
-    while(i != objects.end())
+    typename list<T>::iterator i = lst.begin();
+    
+    while(i != lst.end())
     {
         if(i->selected)
         {
-            list<LevelObject>::iterator ni = i;
+            typename list<T>::iterator ni = i;
             ni++;
-            objects.erase(i);
+            lst.erase(i);
             i = ni;
         }
         else
             i++;
     }
+}
+
+void LevelEditor::deleteObjects()
+{
+    deleteSelected(l->objects);
+    deleteSelected(l->sprites);
+    deleteSelected(l->entrances);
     
-    list<LevelSprite>::iterator i2 = sprites.begin();
-    
-    while(i2 != sprites.end())
-    {
-        if(i2->selected)
-        {
-            list<LevelSprite>::iterator ni = i2;
-            ni++;
-            sprites.erase(i2);
-            i2 = ni;
-        }
-        else
-            i2++;
-    }
 	repaintScreen();
 }
 
-void editObjectNumber(LevelObject& o)
+
+int LevelEditor::countSelectedObjects()
 {
-}
-void editSpriteNumber(LevelSprite& s)
-{
-    s.spriteNum = showList(spriteList, s.spriteNum);
+    int r = 0;
+    for(list<LevelObject>::iterator i = l->objects.begin(); i != l->objects.end(); i++)
+        if(i->selected)
+            r++;
+    for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); i++)
+        if(i->selected)
+            r++;
+            
+    return r;
+
 }
 
-void editorShowPalette()
+void LevelEditor::showPalette()
 {
-    for(list<LevelObject>::iterator i = objects.begin(); i != objects.end(); i++)
+    if(countSelectedObjects() != 1) return;
+    for(list<LevelObject>::iterator i = l->objects.begin(); i != l->objects.end(); i++)
         if(i->selected)
         {
-            editObjectNumber(*i);
+//            editObjectNumber(*i);
             return;
         }
         
-    for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); i++)
+    for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); i++)
         if(i->selected)
         {
-            editSpriteNumber(*i);
+            i->spriteNum = showTextList(spriteList, i->spriteNum);
             return;
         }
 }
 
-void editorShowProperties()
+void LevelEditor::showProperties()
 {
-    for(list<LevelSprite>::iterator i = sprites.begin(); i != sprites.end(); i++)
+    if(countSelectedObjects() != 1) return;
+    for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); i++)
         if(i->selected)
         {
-            editSpriteNumber(*i);
+            editSpriteData(i->spriteData, "Editing Sprite Data", spriteList[i->spriteNum]);
             return;
         }
     

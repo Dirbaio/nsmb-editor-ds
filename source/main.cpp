@@ -32,12 +32,22 @@
 #include "control.h"
 #include "oamUtil.h"
 
-#include "selectablelist.h"
+#include "textlist.h"
 #include "lists.h"
 #include "text.h"
+#include "spritedataeditor.h"
 
 #define mapxy(x, y) map[x+y*32]
 
+void loadNewLevel()
+{
+    if(editor)
+        delete editor;
+        
+    iprintf("Loading Editor!\n");
+    int level = showTextList(levelList);
+	editor = new LevelEditor(levelFileList[level]);
+}
 int main(void)  
 {
 	// install the default exception handler
@@ -67,20 +77,19 @@ int main(void)
 	}
     
     
-    loadLists();
     textInit();
     
-//    showList(spriteList);
-
+    loadLists();
+    
     iprintf("Loading Rom!\n");
     loadROM();
 		
 	uiShow();
     iprintf("Loading OAM!\n");
 	loadOAM();
-    iprintf("Loading Editor!\n");
-    int level = showList(levelList);
-	loadEditor(levelFileList[level]);
+	
+    loadNewLevel();
+//	editor = new LevelEditor("A01_1");
 
 	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0x10, 0);
 	bgShow(2);
@@ -105,11 +114,14 @@ int main(void)
 	while(1)
 	{
 		checkControls();
-		editorRenderSprites();
+		if(keysNowPressed & KEY_START)
+		    loadNewLevel();
+		    
+		editor->renderSprites();
+		oamFrame();
 		swiWaitForVBlank();
 //		renderSprite(10, 10, SpriteSize_16x16, 0, 0);
 //		renderSprite(30, 10, SpriteSize_16x16, 2, 2);
 //		renderRect(5, 5, 24, 56);
-		oamFrame();
 	}
 }
