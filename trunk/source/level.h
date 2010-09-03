@@ -39,8 +39,8 @@ class LevelElement
 	int tx, ty;
 	bool selected;
 	
-	virtual int getSizeMultiplier();
-	virtual bool isResizable();
+	virtual int getSizeMultiplier() const;
+	virtual bool isResizable() const;
 };
 
 class LevelObject : public LevelElement
@@ -56,15 +56,48 @@ class LevelSprite : public LevelElement
 	LevelSprite();
 	byte spriteData[6];
 	int spriteNum;
-	virtual bool isResizable();
+	virtual bool isResizable() const;
 };
 
+class LevelEntrance : public LevelElement
+{
+    public:
+    LevelEntrance();
+    int cameraX, cameraY;
+    int number;
+    int destEntrance, destArea, destView;
+    int pipeID;
+    int type;
+    int settings;
+    bool exitOnly, fadingTransition, ispipe, lowerScreen;
+    
+	virtual int getSizeMultiplier() const;
+	virtual bool isResizable() const;
+};
 
-extern list<LevelObject> objects;
-extern list<LevelSprite> sprites;
+class Level
+{
+    public:
+    list<LevelObject> objects;
+    list<LevelSprite> sprites;
+    list<LevelEntrance> entrances;
+    
+    string levelFilePrefix;
+    u8* levelBlocks[14];
+    u32 levelBlocksLen[14];
 
-void loadLevel(string pf);
-void saveLevel();
-void unloadLevel();
+    Level(string pf);
+    ~Level();
+    void save();
+    
+    void loadBlocks();
+    void saveBlocks();
+    void loadObjects();
+    void saveObjects();
+    void loadSprites();
+    void saveSprites();
+    void loadEntrances();
+    void saveEntrances();
+};
 
 #endif

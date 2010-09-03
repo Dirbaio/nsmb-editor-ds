@@ -18,27 +18,16 @@
 
 #include "level.h"
 
-list<LevelObject> objects;
-list<LevelSprite> sprites;
-
-string levelFilePrefix;
-
-
-uint8 *levelBlocks[14];
-uint levelBlocksLen[14];
-
-bool loaded = false;
-
-inline uint min(uint a, uint b)
+inline u32 min(u32 a, u32 b)
 {
 	return a<b?a:b;
 }
-inline uint max(uint a, uint b)
+inline u32 max(u32 a, u32 b)
 {
 	return a>b?a:b;
 }
 
-void loadObjects()
+void Level::loadObjects()
 {
     NitroFile* bgdatFilePtr = fs->getFileByName(levelFilePrefix+"_bgdat.bin");
 	uint8* bgdatFile = bgdatFilePtr->getContents();
@@ -67,7 +56,7 @@ void loadObjects()
 	delete[] bgdatFile;
 }
 
-void saveObjects()
+void Level::saveObjects()
 {
     int objCount = objects.size();
     iprintf("Saving... %d\n", objCount);
@@ -97,7 +86,7 @@ struct blockPtr
 	uint32 size;
 };
 
-void loadBlocks()
+void Level::loadBlocks()
 {
     NitroFile* levFil = fs->getFileByName(levelFilePrefix+".bin");
 	u8* levelFile = levFil->getContents();
@@ -113,7 +102,7 @@ void loadBlocks()
 	delete[] levelFile;
 }
 
-void saveBlocks()
+void Level::saveBlocks()
 {
     int levelFileLen = 14*8;
     for(int i = 0; i<14; i++)
@@ -137,7 +126,7 @@ void saveBlocks()
     
 }
 
-void loadSprites()
+void Level::loadSprites()
 {
 	int filePos = 0;
 	uint8* block = levelBlocks[6];
@@ -167,7 +156,7 @@ void loadSprites()
 
 }
 
-void saveSprites()
+void Level::saveSprites()
 {
     uint8* block = new u8[sprites.size()*12 + 2];
     int filePos = 0;
@@ -198,57 +187,83 @@ void saveSprites()
     levelBlocksLen[6] = sprites.size()*12 + 2;
 }
 
-
-void loadLevel(string pf)
+void Level::loadEntrances()
 {
-	loaded = true;
-	
+    uint8* block = levelBlocks[5];
+    int filePos = 0;
+    for(int i = 0; i < levelBlocksLen[5] / 20; i++)
+    {
+        LevelEntrance e;
+        e.x = block[filePos] | (block[filePos + 1] << 8);
+        e.y = block[filePos + 2] | (block[filePos + 3] << 8);
+        e.cameraX = block[filePos + 4] | (block[filePos + 5] << 8);
+        e.cameraY = block[filePos + 6] | (block[filePos + 7] << 8);
+        e.number = block[filePos + 8];
+        e.destArea = block[filePos + 9];
+        e.pipeID = block[filePos + 10];
+        e.destEntrance = block[filePos + 12];
+        e.type = block[filePos + 14];
+        //e.settings = block[filePos + 15];
+        //e.Unknown1 = block[filePos + 16];
+        e.destView = block[filePos + 18];
+        //e.Unknown2 = block[filePos + 19];
+        filePos += 20;
+		iprintf("%d %d\n", e.x, e.y);
+		entrances.push_back(e);
+    }
+}
+void Level::saveEntrances()
+{
+
+}
+
+Level::Level(string pf)
+{
     levelFilePrefix = pf;
 	
     objects = list<LevelObject>();
     sprites = list<LevelSprite>();
 	loadObjects();
 	loadBlocks();
+	loadSprites();
+    loadEntrances();
     
     u8 tilnum = levelBlocks[0][0xC];
     iprintf("Tileset Number: %d\n", tilnum);
-	loadSprites();
 	loadTilesets(tilnum);
 }
-void saveLevel()
+void Level::save()
 {
     saveObjects();
     saveSprites();
+    saveEntrances();
     
     saveBlocks();
 }
-void unloadLevel()
+
+Level::~Level()
 {
-	if(!loaded) return;
-	
 	for(int i = 0; i < 14; i++)
 		delete[] levelBlocks[i];
 	
 	unloadTilesets();
-	
-	loaded = false;
 }
 
 
 
 //========================
 
-int LevelElement::getSizeMultiplier()
+int LevelElement::getSizeMultiplier() const
 {
 	return 16;
 }
 
-bool LevelElement::isResizable()
+bool LevelElement::isResizable() const
 {
 	return true;
 }
 
-bool LevelSprite::isResizable()
+bool LevelSprite::isResizable() const
 {
 	return false;
 }
@@ -256,4 +271,20 @@ LevelSprite::LevelSprite()
 {
 	tx = 1;
 	ty = 1;
+}
+
+LevelEntrance::LevelEntrance()
+{
+    tx = 16;
+    ty = 16;
+}
+
+int LevelEntrance::getSizeMultiplier() const
+{
+    return 1;
+}
+
+bool LevelEntrance::isResizable() const
+{
+    return false;
 }

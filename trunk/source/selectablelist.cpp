@@ -19,29 +19,149 @@
 #include "font.h"
 #include "rom.h"
 #include "text.h"
+#include "oamUtil.h"
 
-vector<string> lsts;
 
-namespace selectablelist
+    
+SelectableList::SelectableList()
 {
-    bool selecting;
-    float scrolly, speedy;
-    int selection;
-    touchPosition touch;
-    uint keysNowPressed, keysNowHeld;
-    uint dblTouchTime; //time since last touch
-    float touchy; //y position being touched
-    bool lastTouchPress;
+    selection = 0;
+    scrolly = 0;
+    selecting = true;
+
+    speedy = 0.1;
 }
 
-using namespace selectablelist;
-
-void desmumePrint(const char* s)
+void SelectableList::select(int sel)
 {
-    return;
-    *((vu32*)0x04FFF010) = (u32)s;
+    int rownum = sel / getObjsPerRow();
+    scrolly = rownum * getObjHeight() - 50;
+    if(scrolly < -10) scrolly = -10;
+    if(scrolly > getListHeight() + 10) scrolly = getListHeight() + 10;
+    selection = sel;
+    speedy = 0.1;
 }
 
+void SelectableList::render()
+{
+    scrollList((int)scrolly);
+    int yy = (int) scrolly;
+    int startInd = yy / getObjHeight() * getObjsPerRow();
+    
+    for(int y = startInd; (y / getObjsPerRow()) * getObjHeight() <= yy + 192; y++)
+    {
+        if(y < 0) continue;
+        if(y >= getObjCount()) continue;
+
+        renderObj(y, y==selection);
+    }
+}
+
+void SelectableList::show()
+{
+    bool touchvalid = false;
+    while(selecting)
+    {        
+        scanKeys();
+        touchRead(&touch);
+        keysNowPressed = keysDownRepeat();
+        keysNowHeld = keysHeld();
+
+        if(keysNowHeld & KEY_TOUCH)
+        {
+            if(touchvalid)
+            {
+                float ytouchnow = scrolly + (float)touch.py;
+                if(lastTouchPress )
+                {
+                    float diff = ytouchnow - touchy;
+               
+    //                printf("%4.2f\n", diff);
+                    speedy -= diff / 10;
+                }
+                else
+                {
+                    touchy = ytouchnow;
+                    int nselection = (int)(touchy/getObjHeight());
+                    nselection *= getObjsPerRow();
+                    int obw = 256 / getObjsPerRow();
+                    nselection += touch.px / obw;
+
+                    if(nselection < 0) nselection = 0;
+                    if(nselection >= getObjCount()) nselection = getObjCount()-1;
+                    
+                    if(dblTouchTime < 30 && nselection == selection)
+                        selecting = false;
+                    else
+                        dblTouchTime = 0;
+                        
+                    selection = nselection;
+    //                iprintf("%d\n", selection);
+                }
+            }
+        }
+        else
+            touchvalid = true;
+        
+        if(keysNowHeld & KEY_TOUCH)
+            speedy *= 0.7d;
+        else
+            speedy *= 0.93d;
+        if(scrolly < -300)
+            scrolly = -300;
+
+        bool out = false;
+        if(scrolly < -60)
+        {
+            out = true;
+            speedy += 1;
+        }
+//        iprintf("%d\n", lsts.size()*8 - 192);
+        
+        if(scrolly + 192 - 300 > (float)(getListHeight()))
+            scrolly = (float)getListHeight() + 300 - 192;
+            
+        if(scrolly + 192 - 60 > (float)(getListHeight()))
+        {
+            out = true;
+            speedy -= 1;
+        }
+           
+        float speedyabs = speedy;
+        if(speedy < 0) speedyabs = -speedy;
+        if(speedyabs < 0.1) speedyabs = 0;
+//        printf("%4.2f %4.2f %4.2f\n", speedy, scrolly, touchy);
+        if(speedy != 0)
+        {
+            scrolly += speedy;
+            render();
+        }
+            
+        lastTouchPress = (keysNowHeld & KEY_TOUCH) != 0;
+        dblTouchTime++;
+        oamFrame();
+        swiWaitForVBlank();
+    }
+}
+
+int SelectableList::getObjCount() {return 0;}
+int SelectableList::getObjsPerRow() {return 0;}
+int SelectableList::getObjHeight() {return 0;}
+void SelectableList::renderObj(int ind, bool selected) {}
+void SelectableList::scrollList(int y) {}
+
+int SelectableList::getListHeight()
+{
+    int rowcount = getObjCount() / getObjsPerRow();
+    if(getObjCount() % getObjsPerRow() != 0) rowcount++;
+    return rowcount * getObjHeight();
+}
+
+void SelectableList::objSelected(int ind) {}
+void SelectableList::keyPressed(u32 mask) {}
+
+
+/*
 void renderList(int y0)
 {
     textClearOpaque();
@@ -54,7 +174,7 @@ void renderList(int y0)
             renderText(0, y, 32, 1, lsts[y]);
         else
             renderText(0, y, 32, 0, lsts[y]);
-//        iprintf("%d\n", y);
+//        iprintf("%d\n", yv);
     } 
 }
 int showList(vector<string>& lst)
@@ -152,4 +272,4 @@ int showList(vector<string>& lst, int inisel)
     }
     textClearTransparent();
     return selection;
-}
+}*/
