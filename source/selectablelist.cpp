@@ -39,12 +39,12 @@ void SelectableList::select(int sel)
     if(scrolly < -10) scrolly = -10;
     if(scrolly > getListHeight() + 10) scrolly = getListHeight() + 10;
     selection = sel;
-    speedy = 0.1;
+    render();
 }
 
 void SelectableList::render()
 {
-    scrollList((int)scrolly);
+    beginRender((int)scrolly);
     int yy = (int) scrolly;
     int startInd = yy / getObjHeight() * getObjsPerRow();
     
@@ -55,6 +55,7 @@ void SelectableList::render()
 
         renderObj(y, y==selection);
     }
+    endRender();
 }
 
 void SelectableList::show()
@@ -67,6 +68,7 @@ void SelectableList::show()
         keysNowPressed = keysDownRepeat();
         keysNowHeld = keysHeld();
 
+		bool mustRender = false;
         if(keysNowHeld & KEY_TOUCH)
         {
             if(touchvalid)
@@ -87,14 +89,25 @@ void SelectableList::show()
                     int obw = 256 / getObjsPerRow();
                     nselection += touch.px / obw;
 
-                    if(nselection < 0) nselection = 0;
-                    if(nselection >= getObjCount()) nselection = getObjCount()-1;
+					bool inbounds = true;
+                    if(nselection < 0)
+                    {
+                    	nselection = 0;
+                    	inbounds = false;
+                    }
+                    if(nselection >= getObjCount())
+                    {
+                    	nselection = getObjCount()-1;
+                    	inbounds = false;
+                    }
                     
-                    if(dblTouchTime < 30 && nselection == selection)
+                    if(dblTouchTime < 20 && nselection == selection && inbounds)
                         selecting = false;
                     else
                         dblTouchTime = 0;
                         
+                    if(selection != nselection)
+                   		mustRender = true;
                     selection = nselection;
     //                iprintf("%d\n", selection);
                 }
@@ -104,9 +117,9 @@ void SelectableList::show()
             touchvalid = true;
         
         if(keysNowHeld & KEY_TOUCH)
-            speedy *= 0.7d;
+            speedy *= 0.7f;
         else
-            speedy *= 0.93d;
+            speedy *= 0.96f;
         if(scrolly < -300)
             scrolly = -300;
 
@@ -129,13 +142,16 @@ void SelectableList::show()
            
         float speedyabs = speedy;
         if(speedy < 0) speedyabs = -speedy;
-        if(speedyabs < 0.1) speedyabs = 0;
+        if(speedyabs < 0.1) speedy = 0;
 //        printf("%4.2f %4.2f %4.2f\n", speedy, scrolly, touchy);
         if(speedy != 0)
         {
             scrolly += speedy;
-            render();
+            mustRender = true;
         }
+            
+        if(mustRender)
+            render();
             
         lastTouchPress = (keysNowHeld & KEY_TOUCH) != 0;
         dblTouchTime++;
@@ -148,7 +164,8 @@ int SelectableList::getObjCount() {return 0;}
 int SelectableList::getObjsPerRow() {return 0;}
 int SelectableList::getObjHeight() {return 0;}
 void SelectableList::renderObj(int ind, bool selected) {}
-void SelectableList::scrollList(int y) {}
+void SelectableList::beginRender(int y) {}
+void SelectableList::endRender() {}
 
 int SelectableList::getListHeight()
 {

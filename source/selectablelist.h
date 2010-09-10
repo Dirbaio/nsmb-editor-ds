@@ -46,7 +46,8 @@ class SelectableList
     virtual int getObjsPerRow();
     virtual int getObjHeight();
     virtual void renderObj(int ind, bool selected);
-    virtual void scrollList(int y);
+    virtual void beginRender(int y);
+    virtual void endRender();
     virtual void objSelected(int ind);
     virtual void keyPressed(u32 mask);
     

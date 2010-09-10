@@ -25,6 +25,8 @@
 #include "level.h"
 #include "levelrendering.h"
 #include "ui.h"
+#include "objectlist.h"
+
 
 
 LevelEditor* editor;
@@ -60,6 +62,7 @@ void LevelEditor::updateScroll()
 void LevelEditor::repaintScreen()
 {
 	renderLevel(l, levelx, levelx+256, levely, levely+192);
+	updateScroll();
 }
 
 void LevelEditor::unselectAll()
@@ -351,7 +354,8 @@ void LevelEditor::showPalette()
     for(list<LevelObject>::iterator i = l->objects.begin(); i != l->objects.end(); i++)
         if(i->selected)
         {
-//            editObjectNumber(*i);
+			showObjectList(i->tilesetNum, i->objNum);
+			repaintScreen();
             return;
         }
         

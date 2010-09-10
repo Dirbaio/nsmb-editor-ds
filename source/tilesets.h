@@ -46,6 +46,7 @@ extern uint16 map16Data [TOTAL_MAP16][4];
 extern const uint16 map16Overlays [256][4];
 extern objPointer *objectIndex[3];
 extern int objectCount[3];
+extern int objectOffs[3];
 extern uint8 *objectDefinitions[3];
 
 void loadTilesets(int tileset);

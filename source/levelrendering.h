@@ -29,5 +29,10 @@ using namespace std;
 
 void renderLevel(Level* l, int xMins, int xMaxs, int yMins, int yMaxs);
 void renderLevelSprites(Level* l, uint xMins, uint xMaxs, uint yMins, uint yMaxs, uint xCam, uint yCam);
+void renderObject(uint objNum, uint tilesetNum, int xp, int yp, int w, int h);
+void setRenderingSelected(bool s);
+void beginRenderFrame( int xMins, int xMaxs, int yMins, int yMaxs);
+void endRenderFrame();
+void renderTileRect(int xx, int yy, int tx, int ty, int linetile);
 
 #endif
