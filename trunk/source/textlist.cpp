@@ -44,7 +44,7 @@ void TextList::renderObj(int ind, bool selected)
         renderText(0, ind%32, 32, 0, lst[ind]);
 }
 
-void TextList::scrollList(int y)
+void TextList::beginRender(int y)
 {
 //    iprintf("scroll: %d \n", y);
     textScroll(y);

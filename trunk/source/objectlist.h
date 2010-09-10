@@ -16,8 +16,8 @@
 */
 
 
-#ifndef _TEXTLIST_H
-#define _TEXTLIST_H
+#ifndef _OBJECTLIST_H
+#define _OBJECTLIST_H
 
 #include "selectablelist.h"
 #include <vector>
@@ -26,21 +26,19 @@
 using namespace std;
 
 
-class TextList : public SelectableList
+class ObjectList : public SelectableList
 {
     public:
     
-    vector<string> lst;
-    
-    TextList(vector<string>& ls);
+    ObjectList(int tileset, int obj);
     virtual int getObjCount();
     virtual int getObjsPerRow();
     virtual int getObjHeight();
     virtual void renderObj(int ind, bool selected);
     virtual void beginRender(int y);
+    virtual void endRender();
 };
 
-int showTextList(vector<string>& lst);
-int showTextList(vector<string>& lst, int inisel);
+void showObjectList(int& tileset, int& obj);
 
 #endif

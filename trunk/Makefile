@@ -30,14 +30,14 @@ GAME_SUBTITLE2 :=	jul.rustedlogic.net
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-marm -mthumb-interwork
+ARCH	:=	-mthumb -mthumb-interwork
 
 CFLAGS	:=	-g -Wall -O3\
  		-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 		-ffast-math -fno-inline\
 		$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM9 -DDEBUG
+CFLAGS	+=	$(INCLUDE) -DARM9
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
@@ -124,7 +124,7 @@ clean:
 	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).nds
 
 run: 
-	@"/c/Archivos de programa/WinDS PRO/DeSmuME/desmume.exe" $(OUTPUT).nds
+	nds $(OUTPUT).nds
 #---------------------------------------------------------------------------------
 else
  
@@ -133,6 +133,7 @@ else
 #---------------------------------------------------------------------------------
 $(OUTPUT).nds	: 	$(OUTPUT).elf
 	@ndstool -c $@ -9 $< -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1);$(GAME_SUBTITLE2)" $(_ADDFILES)
+	@dlditool $(CURDIR)/../mpcf.dldi $(OUTPUT).nds
 	@echo built ... $(notdir $@)
 	
 $(OUTPUT).elf	:	$(OFILES)
@@ -142,7 +143,7 @@ $(OUTPUT).elf	:	$(OFILES)
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	$(bin2o)
-
+ 
 #---------------------------------------------------------------------------------
 # This rule creates assembly source files using grit
 # grit takes an image file and a .grit describing how the file is to be processed

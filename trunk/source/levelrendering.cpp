@@ -437,6 +437,7 @@ void renderTileLineHor(int x, int y, int linetile)
 
 void renderTileRect(int xx, int yy, int tx, int ty, int linetile)
 {
+	renderingSelected = false;
 	xx *= 2;
 	yy *= 2;
 	tx *= 2;
@@ -476,9 +477,8 @@ void renderSprites(Level* l)
 
 }
 
-void renderLevel(Level* l, int xMins, int xMaxs, int yMins, int yMaxs)
+void beginRenderFrame( int xMins, int xMaxs, int yMins, int yMaxs)
 {
-    
 	bg2ptr = (uint16*)0x06018000;
 	bg3ptr = (uint16*)0x0601A000;
 		
@@ -486,12 +486,23 @@ void renderLevel(Level* l, int xMins, int xMaxs, int yMins, int yMaxs)
 	yMin = yMins;
 	xMax = xMaxs;
 	yMax = yMaxs;
-		
-    
+	
+	
 	//Zero out the zone we're going to redraw...
 	for(int x = xMin/16; x <= xMax/16; x++)
 		for(int y = yMin/16; y <= yMax/16; y++)
 			setMap16TileXY(x, y, 0);
+}
+
+void endRenderFrame()
+{
+}
+
+void renderLevel(Level* l, int xMins, int xMaxs, int yMins, int yMaxs)
+{
+    beginRenderFrame(xMins, xMaxs, yMins, yMaxs);
+
+    
 
 /*
 	for(uint x = 0; x < 16; x++)
@@ -531,6 +542,7 @@ void renderLevel(Level* l, int xMins, int xMaxs, int yMins, int yMaxs)
 
 	
 	renderSprites(l);
+	endRenderFrame();
 
 }
 
@@ -542,4 +554,9 @@ void renderMinimap()
 void load()
 {
 	
+}
+
+void setRenderingSelected( bool b)
+{
+	renderingSelected = b;
 }

@@ -35,7 +35,7 @@
 #include "textlist.h"
 #include "lists.h"
 #include "text.h"
-#include "spritedataeditor.h"
+#include "objectlist.h"
 
 #define mapxy(x, y) map[x+y*32]
 
@@ -87,10 +87,6 @@ int main(void)
 	uiShow();
     iprintf("Loading OAM!\n");
 	loadOAM();
-	
-    loadNewLevel();
-//	editor = new LevelEditor("A01_1");
-
 	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0x10, 0);
 	bgShow(2);
 	bgSetPriority(2, 1);
@@ -100,6 +96,12 @@ int main(void)
 	bgSetPriority(3, 0);
 	REG_BG3CNT |= BG_WRAP_ON;
 	bgUpdate();
+		
+	loadTilesets(0);
+    loadNewLevel();
+//	editor = new LevelEditor("A01_1");
+
+
 	iprintf("Done loading everything!\n");
 	
     /*
