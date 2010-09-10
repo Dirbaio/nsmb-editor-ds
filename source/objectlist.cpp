@@ -47,18 +47,18 @@ void ObjectList::renderObj(int ind, bool selected)
 		obj = ind;
 	}
 //	iprintf("%d %d: %d %d\n", ind, selected, til, obj);
-	renderObject(obj, til, col*4, row*3, 3, 2);
+	renderObject(obj, til, col*4+1, row*3, 3, 2);
 	if(selected)
-		renderTileRect(col*4, row*3, 3, 2,  0x3e9);
+		renderTileRect(col*4+1, row*3, 3, 2,  0x3e9);
 }
 
 void ObjectList::beginRender(int y)
 {
-	bgSetScroll(2, 512-8, y%512);
-	bgSetScroll(3, 512-8, y%512);
+	bgSetScroll(2, 8, y%512);
+	bgSetScroll(3, 8, y%512);
 
 	bgUpdate();
-	beginRenderFrame(0, 256, y, y+192);
+	beginRenderFrame(0, 272, y, y+192);
 }
 
 void ObjectList::endRender()

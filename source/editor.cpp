@@ -62,7 +62,6 @@ void LevelEditor::updateScroll()
 void LevelEditor::repaintScreen()
 {
 	renderLevel(l, levelx, levelx+256, levely, levely+192);
-	updateScroll();
 }
 
 void LevelEditor::unselectAll()
@@ -356,6 +355,7 @@ void LevelEditor::showPalette()
         {
 			showObjectList(i->tilesetNum, i->objNum);
 			repaintScreen();
+			updateScroll();
             return;
         }
         
@@ -363,6 +363,8 @@ void LevelEditor::showPalette()
         if(i->selected)
         {
             i->spriteNum = showTextList(spriteList, i->spriteNum);
+			repaintScreen();
+			updateScroll();
             return;
         }
 }
