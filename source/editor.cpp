@@ -375,7 +375,7 @@ void LevelEditor::showProperties()
     for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); i++)
         if(i->selected)
         {
-            editSpriteData(i->spriteData, "Editing Sprite Data", spriteList[i->spriteNum]);
+            editSpriteData(i->spriteData, "Editing Sprite Data", spriteList[i->spriteNum],i->spriteNum);
             return;
         }
     
