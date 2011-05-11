@@ -17,7 +17,6 @@
 
 #include<vector>
 #include<string>
-
 using namespace std;
 
 extern vector<string> jyotyuAnnotationList;
@@ -27,7 +26,7 @@ extern vector<string> entranceList;
 extern vector<string> topBGList;
 extern vector<string> bottomBGList;
 extern vector<string> musicList;
-
+extern vector<int> spriteDataList;
 extern vector<string> levelList;
 extern vector<string> levelFileList;
 void loadLists();

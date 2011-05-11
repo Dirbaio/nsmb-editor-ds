@@ -33,6 +33,7 @@
 #include "oamUtil.h"
 
 #include "textlist.h"
+#include "spritedataeditor.h"
 #include "lists.h"
 #include "text.h"
 #include "objectlist.h"
