@@ -117,7 +117,7 @@ int findspriteentry(int from){//It likes u32 YAY (I changed it :P)
 	for(i=0;i<=spriteDataList.size();i++){
 		if (spriteDataList[i]=='s'){
 			addr2=i;
-			i=spriteDataList.size;
+			i=spriteDataList.size();
 		}
 	}
 	return addr2;
@@ -133,16 +133,7 @@ int getspritenum(int i){
 		i++;
 	}
 	addr=i;
-	if (spritenums[3]!=0)
-		iprintf("No sprite has this certain value. at:%d",addr);
-	}
-	else if (spritenums[2]!=0){
-		returnvalue=(spritenums[0]*100)+(spritenums[1]*10)+spritenums[2]);
-	}
-	else if (spritenums[1]!=0){
-		returnvalue=(spritenums[0]*10)+spritenums[1];
-	}
-	else returnvalue=spritenums[0];
+	returnvalue=1;
 	return returnvalue;
 }
 void readSpriteData(){
