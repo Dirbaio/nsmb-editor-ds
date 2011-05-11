@@ -21,4 +21,5 @@
 using namespace std;
 
 void editSpriteData(u8* ptr, string sa, string sb,int spritenum);
+void readSpriteData();
 

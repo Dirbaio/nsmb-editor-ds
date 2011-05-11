@@ -16,7 +16,7 @@
 */
 
 #include "lists.h"
-
+#include "spritedataeditor.h"
 #include <stdio.h>
 
 vector<string> jyotyuAnnotationList;
@@ -26,7 +26,7 @@ vector<string> entranceList;
 vector<string> topBGList;
 vector<string> bottomBGList;
 vector<string> musicList;
-
+vector<int> spriteDataList;
 vector<string> levelList;
 vector<string> levelFileList;
 
@@ -102,7 +102,16 @@ void loadLevelList(const char* fname)
         fclose (f);
     }
 }
-
+void loadSpriteData(const char* fname){
+	FILE* d=fopen(fname,"rb");
+	int ch;
+	ch=fgetc(d);
+	while(ch!=EOF){
+		spriteDataList.push_back((char)ch);
+		ch=fgetc(d);
+	}
+	readSpriteData();
+}
 void loadLists()
 {
     loadList("sprlist.txt", spriteList);
@@ -110,5 +119,6 @@ void loadLists()
     loadList("bbglist.txt", bottomBGList);
     loadList("muslist.txt", musicList);
     loadList("entlist.txt", entranceList);
+	loadSpriteData("sprdata.txt");
     loadLevelList("levellist.txt");
 }
