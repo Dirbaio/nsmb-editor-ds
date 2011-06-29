@@ -35,117 +35,29 @@ namespace spritedataeditor
     u8 origval;
 	bool SprDtaLoaded=false;
     string msg1, msg2;
-
+	FILE* f;
 	unsigned int addr;
-	typedef struct{
-		string listnames[6];
-		string listn1[6];
-		string listn2[6];
-		string listn3[6];
-		string listn4[6];
-		string listn5[6];
-		int uselistupto[6];
-		int listnibble[6];
-		bool usinglist[6];
-		string checkboxes[6];
-		int checkboxesnibble[6];
-		bool usingchbox[6];
-		string values[6];
-		int valuenibble[6];
-		bool usingvalue[6];
-		bool hasspritedata;
-	}sdstruct;
-	sdstruct spritedatastruct[323];
+
 }
 
 using namespace spritedataeditor;
 #define xstart 7
-#define ystart 11/*
-#define LIST 11
-void readSpriteData(int neededspr){
-	if (!SprDtaLoaded){
-		int spriten;
-		int t=0;
-		int ch=0;
-		int s1=0;
-		int s2=0;
-		int s3=0;
-		bool gsn=false;
-		spriten=0;
-		FILE* d=fopen("sprdata.txt","rb");
-		while(t!=20){
-			if (t==0){
-
-				gsn=false;
-
-				while (!gsn){
-					ch=fgetc(d);
-					if (ch=='s') gsn=true; //continue until we find the character "s"
-				}
-				if (gsn){
-					s1=fgetc(d);
-					s1-=48;
-					s2=fgetc(d);
-					if (s2!='<'){
-						s3=fgetc(d);
-						s2-=48;
-					}
-				}
-				if (s2=='<'){
-					spriten=s1;
-				}
-				else if (s3=='<'){
-					spriten=(s1*10)+s2;
-				}
-				else if (fgetc(d)!='<'){
-					iprintf("There is an error with the spritedata file!\nPlease tell somebody on the JUL forums with a copy of the spritedata file");//No end of sprite
-					while(1);
-				}
-				else spriten=(s1*100)+(s2*10)+(s3-48);//Keep in mind s3 is still in an ASCII form.
-				iprintf("%d \n",spriten);
-				if (spriten==neededspr){
-					t=20;
-					iprintf("Stopping Read!\n");
-				}
-			}
+#define ystart 11
+bool ReadForSprite(){
+		char sprite[255];
+		if(fscanf(f,"%s",sprite)!=EOF){
+			if (strncmp (sprite,"sprite",6)==0) return true;
+			else return false;
+		}else return false;
+}	
+void readSpriteData(const char* fname){
+	f=fopen("sprdata.txt", "rb");
+	bool stop=false;
+		while (ReadForSprite()){
+			iprintf("Found Sprite\n");
+			
 		}
-	}
-}*/
-int findspriteentry(int from){//It likes u32 YAY (I changed it :P)
-	int i;
-	int addr2=65535;
-	for(i=0;i<=spriteDataList.size();i++){
-		if (spriteDataList[i]=='s'){
-			addr2=i;
-			i=spriteDataList.size();
-		}
-	}
-	return addr2;
-}
-int getspritenum(int i){
-	int spritenums[3];
-	int count;
-	int v;
-	int returnvalue;
-	while (spriteDataList[i]!='<'){
-		spritenums[count]=spriteDataList[i];
-		count++;
-		i++;
-	}
-	addr=i;
-	returnvalue=1;
-	return returnvalue;
-}
-void readSpriteData(){
-	//iprintf("YAY\n"); //This works and I feel like getting rid of it :P
-	//First we need to find the letter sprite...
-	int spritenum;
-	unsigned int curaddr=0;
-	addr=findspriteentry(curaddr);
-	iprintf("%d",addr);
-	curaddr=addr;
-	spritenum=getspritenum(curaddr+1);
-	iprintf("getspritenum returned  %d",spritenum);
+		stop=true;
 }
 void renderSpriteData()
 {
