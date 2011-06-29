@@ -103,14 +103,7 @@ void loadLevelList(const char* fname)
     }
 }
 void loadSpriteData(const char* fname){
-	FILE* d=fopen(fname,"rb");
-	int ch;
-	ch=fgetc(d);
-	while(ch!=EOF){
-		spriteDataList.push_back((char)ch);
-		ch=fgetc(d);
-	}
-	readSpriteData();
+	readSpriteData(fname);
 }
 void loadLists()
 {
