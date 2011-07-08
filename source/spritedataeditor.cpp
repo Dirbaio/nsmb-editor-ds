@@ -24,7 +24,7 @@
 #include <cstdio>
 #include "oamUtil.h"
 #include "lists.h"
-
+#define DEBUG true
 namespace spritedataeditor
 {
     touchPosition touch;
@@ -37,14 +37,35 @@ namespace spritedataeditor
     string msg1, msg2;
 	FILE* f;
 	unsigned int addr;
-
+	bool isd=false; //impossible sprite data
 }
 
 using namespace spritedataeditor;
 #define xstart 7
 #define ystart 11
+#define L_list 1
+#define L_checkbox 2
+#define L_number 3
+#define L_label 4
+int GetType(){
+	char type[25];
+	if (fscanf(f,"%s",type)!=EOF){
+		if (!strncmp(type,"list",4)) return L_list;
+		else if (!strncmp(type,"checkbox",8)) return L_checkbox;
+		else if (!strncmp(type,"number",6)) return L_number;
+		else if (!strncmp(type,"label",5)) return L_label;
+
+	}
+	else return 0;
+	return 0;
+}
+int GetSpriteNum(){
+	int spritenum=255;
+	if (fscanf(f,"%d",&spritenum)!=EOF) return spritenum;
+	else return -1;
+}
 bool ReadForSprite(){
-		char sprite[255];
+		char sprite[10];
 		if(fscanf(f,"%s",sprite)!=EOF){
 			if (strncmp (sprite,"sprite",6)==0) return true;
 			else return false;
@@ -54,10 +75,21 @@ void readSpriteData(const char* fname){
 	f=fopen("sprdata.txt", "rb");
 	bool stop=false;
 		while (ReadForSprite()){
-			iprintf("Found Sprite\n");
-			
+			if (DEBUG) iprintf("Found Sprite\n");
+			int snum=GetSpriteNum();
+			if (DEBUG) iprintf("Sprite number is: %d\n",snum);
+			int type=GetType();
+			if (type==0){
+				iprintf("\n\nAn entry in the sprdata.txt has an invalid type\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
+				iprintf("\nPress A to continue!\n");
+				while(!(keysHeld() & KEY_A)) scanKeys();
+				isd=true;
+			}
+			else if (DEBUG) iprintf("GetType() returned: %d\n",type);
 		}
 		stop=true;
+		if (DEBUG) iprintf("DEBUG has beed set, Please press A.");
+		if (DEBUG) while(!(keysHeld() & KEY_A)) scanKeys();
 }
 void renderSpriteData()
 {

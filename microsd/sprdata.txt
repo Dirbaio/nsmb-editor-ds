@@ -1,3 +1,8 @@
-sprite sprite
-sprite
-sprite sprite sprite
+sprite 149
+list
+sprite 48
+checkbox
+sprite 24
+number
+sprite 18
+label
