@@ -1,8 +1,4 @@
-sprite 149
-list
-sprite 48
-checkbox
-sprite 24
-number
-sprite 18
-label
+sprite 231
+checkbox 6 1
+Visable
+end
