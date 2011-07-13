@@ -38,6 +38,16 @@ namespace spritedataeditor
 	FILE* f;
 	unsigned int addr;
 	bool isd=false; //impossible sprite data
+	int curamount;
+	typedef struct{
+		char heading[8][20];
+		int take[8];
+		int subs[8];
+		int nibble[8];
+		int type[8];
+		bool gsd;
+	}strdtal;
+	strdtal spritedatastruct[323];
 }
 
 using namespace spritedataeditor;
@@ -47,14 +57,53 @@ using namespace spritedataeditor;
 #define L_checkbox 2
 #define L_number 3
 #define L_label 4
+#define L_snumber 5
+#define L_binary 6
+#define L_end 7
+void chboxread(int snum){
+	int mask=1;
+	int nibble;
+
+	char heading[20];
+		if (fscanf(f,"%d",&nibble)!=EOF){
+		spritedatastruct[snum].nibble[curamount]=nibble;
+		printf("Nibble: %d\n",nibble);
+	}
+	if (fscanf(f,"%d",&mask)!=EOF){
+		spritedatastruct[snum].take[curamount]=mask;
+		printf("Mask: %d\n",mask);
+
+	}
+	else{
+		printf ("ERROR with chboxread()\n");
+		iprintf("\nPress A to continue!\n");
+		while(!(keysHeld() & KEY_A)) scanKeys();
+		isd=true;
+	}
+	fgets(&heading[0],20,f);
+	if (!(ferror(f) || feof(f))){
+		strcpy(spritedatastruct[snum].heading[curamount],heading);
+	}
+	else{
+		printf ("ERROR with chboxread()\n");
+		iprintf("\nPress A to continue!\n");
+		while(!(keysHeld() & KEY_A)) scanKeys();
+		isd=true;
+	}
+	printf("Heading: %s\n",heading);
+	spritedatastruct[snum].type[curamount]=L_checkbox;
+	curamount++;
+}
 int GetType(){
 	char type[25];
 	if (fscanf(f,"%s",type)!=EOF){
 		if (!strncmp(type,"list",4)) return L_list;
 		else if (!strncmp(type,"checkbox",8)) return L_checkbox;
 		else if (!strncmp(type,"number",6)) return L_number;
+		else if (!strncmp(type,"snumber",7)) return L_snumber;
 		else if (!strncmp(type,"label",5)) return L_label;
-
+		else if (!strncmp(type,"binary",6)) return L_binary;
+		else if (!strncmp(type,"end",3)) return L_end;
 	}
 	else return 0;
 	return 0;
@@ -72,40 +121,69 @@ bool ReadForSprite(){
 		}else return false;
 }	
 void readSpriteData(const char* fname){
+	int type,snum;
 	f=fopen("sprdata.txt", "rb");
 	bool stop=false;
 		while (ReadForSprite()){
 			if (DEBUG) iprintf("Found Sprite\n");
-			int snum=GetSpriteNum();
+			snum=GetSpriteNum();
 			if (DEBUG) iprintf("Sprite number is: %d\n",snum);
-			int type=GetType();
-			if (type==0){
-				iprintf("\n\nAn entry in the sprdata.txt has an invalid type\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
-				iprintf("\nPress A to continue!\n");
-				while(!(keysHeld() & KEY_A)) scanKeys();
-				isd=true;
+			while((type=GetType())!=L_end){
+				if (type==0){
+					iprintf("\n\nAn entry in the sprdata.txt has an invalid type\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
+					iprintf("\nPress A to continue!\n");
+					while(!(keysHeld() & KEY_A)) scanKeys();
+					isd=true;
+				}
+				else if (DEBUG) iprintf("GetType() returned: %d\n",type);
+				if (type==L_checkbox){
+					chboxread(snum);
+			spritedatastruct[snum].gsd=true;
+
+				}
 			}
-			else if (DEBUG) iprintf("GetType() returned: %d\n",type);
 		}
 		stop=true;
 		if (DEBUG) iprintf("DEBUG has beed set, Please press A.");
 		if (DEBUG) while(!(keysHeld() & KEY_A)) scanKeys();
+
 }
-void renderSpriteData()
+void renderSpriteData(int snum)
 {
-    textClearOpaque();
-    renderText(0, 0, 32, 1, msg1);
-    renderText(0, 1, 32, 0, msg2);
-    for(int i = 0; i < 6; i++)
-    {
-        renderChar(i*3+xstart, ystart-1, 0, (char)30);
-        renderChar(i*3+xstart+1, ystart-1, 0, (char)30);
-        renderHexChar(i*3+xstart, ystart, selection==i*2?1:0, ptr[i] >> 4);
-        renderHexChar(i*3+xstart+1, ystart, selection==i*2+1?1:0, ptr[i] & 0xF);
-        renderChar(i*3+xstart, ystart+1, 0, (char)31);
-        renderChar(i*3+xstart+1, ystart+1, 0, (char)31);
-    }
-    renderText(3, 22, 5, 0, "OK");
+	if (!spritedatastruct[snum].gsd && !isd){
+		textClearOpaque();
+		renderText(0, 0, 32, 1, msg1);
+		renderText(0, 1, 32, 0, msg2);
+		for(int i = 0; i < 6; i++)
+		{
+			renderChar(i*3+xstart, ystart-1, 0, (char)30);
+			renderChar(i*3+xstart+1, ystart-1, 0, (char)30);
+			renderHexChar(i*3+xstart, ystart, selection==i*2?1:0, ptr[i] >> 4);
+			renderHexChar(i*3+xstart+1, ystart, selection==i*2+1?1:0, ptr[i] & 0xF);
+			renderChar(i*3+xstart, ystart+1, 0, (char)31);
+			renderChar(i*3+xstart+1, ystart+1, 0, (char)31);
+		}
+		renderText(3, 22, 5, 0, "OK");
+	}
+	else {
+		int i=0;
+		string temps;
+		
+		int selected[8];
+		for (i=0;i<=8;i++){
+			selected[8]=0;
+		}
+		textClearOpaque();
+		renderText(0, 0, 32, 1, msg1);
+		renderText(0, 1, 32, 0, msg2);
+		// Render the new way....
+		for (i=0;i<=8;i++){
+			if (spritedatastruct[snum].type[i]==L_checkbox){
+				strcpy(&temps[0],spritedatastruct[snum].heading[i]);
+				renderText(0,2,20,selected[i],temps);
+			}
+		}
+	}
 }	
 
 u8 getNibble(int i)
@@ -145,7 +223,7 @@ void editSpriteData(u8* sptr, string sa, string sb, int spritenum)
     selection = -1;
     while(selecting)
     {        
-        renderSpriteData();
+        renderSpriteData(spritenum);
         scanKeys();
         touchRead(&touch);
         keysNowPressed = keysDown();
