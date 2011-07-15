@@ -39,11 +39,12 @@ namespace spritedataeditor
 	unsigned int addr;
 	bool isd=false; //impossible sprite data
 	int curamount;
+	int format;
 	typedef struct{
 		char heading[8][20];
 		int take[8];
 		int subs[8];
-		int nibble[8];
+		int nybble[8];
 		int type[8];
 		bool gsd;
 	}strdtal;
@@ -60,14 +61,34 @@ using namespace spritedataeditor;
 #define L_snumber 5
 #define L_binary 6
 #define L_end 7
+#define L_PC 8
+int calcnybble(int x){
+	if (x<1) x+=2;
+	else if (x<3) x-=2;
+	else if (x<5) x+=6;
+	else if (x<7) x+=2;
+	else if (x<9) x-=2;
+	else x-=6;
+	return x;
+}
+
+void chformat(){
+	if (fscanf(f,"%d",&format)==EOF)
+		isd=true;
+}
 void chboxread(int snum){
 	int mask=1;
-	int nibble;
+	int nybble;
 
 	char heading[20];
-		if (fscanf(f,"%d",&nibble)!=EOF){
-		spritedatastruct[snum].nibble[curamount]=nibble;
-		printf("Nibble: %d\n",nibble);
+		if (fscanf(f,"%d",&nybble)!=EOF){
+		spritedatastruct[snum].nybble[curamount]=nybble;
+		if (format==L_PC){
+			printf("old nybble: %d\n",nybble);
+			int nnybble =calcnybble(nybble);
+			spritedatastruct[snum].nybble[curamount]=nnybble;
+			printf("New nybble: %d\n",nnybble);
+		}
 	}
 	if (fscanf(f,"%d",&mask)!=EOF){
 		spritedatastruct[snum].take[curamount]=mask;
@@ -124,6 +145,7 @@ void readSpriteData(const char* fname){
 	int type,snum;
 	f=fopen("sprdata.txt", "rb");
 	bool stop=false;
+	chformat();
 		while (ReadForSprite()){
 			if (DEBUG) iprintf("Found Sprite\n");
 			snum=GetSpriteNum();
@@ -150,7 +172,6 @@ void readSpriteData(const char* fname){
 }
 void renderSpriteData(int snum)
 {
-	if (!spritedatastruct[snum].gsd && !isd){
 		textClearOpaque();
 		renderText(0, 0, 32, 1, msg1);
 		renderText(0, 1, 32, 0, msg2);
@@ -164,36 +185,18 @@ void renderSpriteData(int snum)
 			renderChar(i*3+xstart+1, ystart+1, 0, (char)31);
 		}
 		renderText(3, 22, 5, 0, "OK");
-	}
-	else {
-		int i=0;
-		string temps;
-		
-		int selected[8];
-		for (i=0;i<=8;i++){
-			selected[8]=0;
-		}
-		textClearOpaque();
-		renderText(0, 0, 32, 1, msg1);
-		renderText(0, 1, 32, 0, msg2);
-		// Render the new way....
-		for (i=0;i<=8;i++){
-			if (spritedatastruct[snum].type[i]==L_checkbox){
-				strcpy(&temps[0],spritedatastruct[snum].heading[i]);
-				renderText(0,2,20,selected[i],temps);
-			}
-		}
-	}
+
+
 }	
 
-u8 getNibble(int i)
+u8 getnybble(int i)
 {
     u8 n = ptr[i/2];
     if(i % 2 == 0) return n >> 4;
     else return n & 0xF;
 }
 
-void setNibble(int i, u8 nval)
+void setnybble(int i, u8 nval)
 {
     nval &= 0xF;
     
@@ -213,48 +216,74 @@ void setNibble(int i, u8 nval)
 
 void editSpriteData(u8* sptr, string sa, string sb, int spritenum)
 {
-    ptr = sptr;
-    msg1 = sa;
-    msg2 = sb;
-    
-    textScroll(0);
-    bool selecting = true;
-    iprintf("YAY YAY\n");
-    selection = -1;
-    while(selecting)
-    {        
-        renderSpriteData(spritenum);
-        scanKeys();
-        touchRead(&touch);
-        keysNowPressed = keysDown();
-        keysNowHeld = keysHeld();
+	if (!spritedatastruct[spritenum].gsd || isd)
+	{
+		ptr = sptr;
+		msg1 = sa;
+		msg2 = sb;
+	    
+		textScroll(0);
+		bool selecting = true;
+		iprintf("YAY YAY\n");
+		selection = -1;
+		while(selecting)
+		{        
+			renderSpriteData(spritenum);
+			scanKeys();
+			touchRead(&touch);
+			keysNowPressed = keysDown();
+			keysNowHeld = keysHeld();
 
-        if(keysNowPressed & KEY_TOUCH)
-        {
-            int y = touch.py / 8;
-            if(y > 21) selecting = false;
-            selection = -1;
-            if(y > ystart-2 && y < ystart+2)
-            {
-                int x = touch.px / 8;
-                x -= xstart;
-                int bx = x / 3;
-                if(x % 3 != 2)
-                    selection = bx * 2 + x % 3;
-            }
-            if(selection != -1)
-                origval = getNibble(selection);
-        }
-        else if(keysNowHeld & KEY_TOUCH && selection != -1)
-        {
-            int y = ystart - touch.py / 8;
-            setNibble(selection, origval+y);
-        }
-        
+			if(keysNowPressed & KEY_TOUCH)
+			{
+				int y = touch.py / 8;
+				if(y > 21) selecting = false;
+				selection = -1;
+				if(y > ystart-2 && y < ystart+2)
+				{
+					int x = touch.px / 8;
+					x -= xstart;
+					int bx = x / 3;
+					if(x % 3 != 2)
+						selection = bx * 2 + x % 3;
+				}
+				if(selection != -1)
+					origval = getnybble(selection);
+			}
+			else if(keysNowHeld & KEY_TOUCH && selection != -1)
+			{
+				int y = ystart - touch.py / 8;
+				setnybble(selection, origval+y);
+			}
+	        
 
-        lastTouchPress = (keysNowHeld & KEY_TOUCH) != 0;
-        oamFrame();
-        swiWaitForVBlank();
-    }
-    textClearTransparent();
+			lastTouchPress = (keysNowHeld & KEY_TOUCH) != 0;
+			oamFrame();
+			swiWaitForVBlank();
+		}
+		textClearTransparent();
+	}
+	else if (spritedatastruct[spritenum].gsd && !isd)
+	{	//Render the new way
+		ptr = sptr;
+		msg1 = sa;
+		msg2 = sb;
+	    
+		textScroll(0);
+		bool selecting = true;
+		while(selecting){
+			textClearOpaque();
+			renderText(0, 0, 32, 1, msg1);
+			renderText(0, 1, 32, 0, msg2);
+			scanKeys();
+			if (keysDown() & KEY_TOUCH){
+				touchRead(&touch);	
+				int y = touch.py / 8;
+				if(y > 21) selecting = false;
+			}
+			oamFrame();
+			swiWaitForVBlank();
+		}
+	}
 }
+
