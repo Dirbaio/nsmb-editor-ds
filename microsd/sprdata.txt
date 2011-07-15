@@ -1,4 +1,3 @@
 sprite 231
-checkbox 6 1
-Visable
+checkbox 8 1 Visable
 end

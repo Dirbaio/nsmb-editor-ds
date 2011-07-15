@@ -62,15 +62,7 @@ using namespace spritedataeditor;
 #define L_binary 6
 #define L_end 7
 #define L_PC 8
-int calcnybble(int x){
-	if (x<1) x+=2;
-	else if (x<3) x-=2;
-	else if (x<5) x+=6;
-	else if (x<7) x+=2;
-	else if (x<9) x-=2;
-	else x-=6;
-	return x;
-}
+
 
 void chformat(){
 	if (fscanf(f,"%d",&format)==EOF)
@@ -81,14 +73,15 @@ void chboxread(int snum){
 	int nybble;
 
 	char heading[20];
-		if (fscanf(f,"%d",&nybble)!=EOF){
+	if (fscanf(f,"%d",&nybble)!=EOF){
 		spritedatastruct[snum].nybble[curamount]=nybble;
-		if (format==L_PC){
-			printf("old nybble: %d\n",nybble);
-			int nnybble =calcnybble(nybble);
-			spritedatastruct[snum].nybble[curamount]=nnybble;
-			printf("New nybble: %d\n",nnybble);
-		}
+			printf("Nybble: %d\n",nybble);
+	}
+	else {
+		printf ("ERROR with chboxread()\n");
+		iprintf("\nPress A to continue!\n");
+		while(!(keysHeld() & KEY_A)) scanKeys();
+		isd=true;
 	}
 	if (fscanf(f,"%d",&mask)!=EOF){
 		spritedatastruct[snum].take[curamount]=mask;
@@ -101,7 +94,8 @@ void chboxread(int snum){
 		while(!(keysHeld() & KEY_A)) scanKeys();
 		isd=true;
 	}
-	fgets(&heading[0],20,f);
+	fscanf(f,"%s",&heading[0]);
+	//fgets(&heading[0],20,f);
 	if (!(ferror(f) || feof(f))){
 		strcpy(spritedatastruct[snum].heading[curamount],heading);
 	}
@@ -114,6 +108,7 @@ void chboxread(int snum){
 	printf("Heading: %s\n",heading);
 	spritedatastruct[snum].type[curamount]=L_checkbox;
 	curamount++;
+	spritedatastruct[snum].gsd=true;
 }
 int GetType(){
 	char type[25];
@@ -150,17 +145,17 @@ void readSpriteData(const char* fname){
 			if (DEBUG) iprintf("Found Sprite\n");
 			snum=GetSpriteNum();
 			if (DEBUG) iprintf("Sprite number is: %d\n",snum);
-			while((type=GetType())!=L_end){
+			while((type=GetType())!=L_end || isd){
 				if (type==0){
 					iprintf("\n\nAn entry in the sprdata.txt has an invalid type\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
 					iprintf("\nPress A to continue!\n");
+					iprintf("DEBUG: %d\n",type);
 					while(!(keysHeld() & KEY_A)) scanKeys();
 					isd=true;
 				}
 				else if (DEBUG) iprintf("GetType() returned: %d\n",type);
 				if (type==L_checkbox){
 					chboxread(snum);
-			spritedatastruct[snum].gsd=true;
 
 				}
 			}
@@ -214,9 +209,9 @@ void setnybble(int i, u8 nval)
     ptr[i/2] = val;
 }
 
-void editSpriteData(u8* sptr, string sa, string sb, int spritenum)
+void editSpriteData(u8* sptr, string sa, string sb, int snum)
 {
-	if (!spritedatastruct[spritenum].gsd || isd)
+	if (!spritedatastruct[snum].gsd || isd)
 	{
 		ptr = sptr;
 		msg1 = sa;
@@ -224,11 +219,10 @@ void editSpriteData(u8* sptr, string sa, string sb, int spritenum)
 	    
 		textScroll(0);
 		bool selecting = true;
-		iprintf("YAY YAY\n");
 		selection = -1;
 		while(selecting)
 		{        
-			renderSpriteData(spritenum);
+			renderSpriteData(snum);
 			scanKeys();
 			touchRead(&touch);
 			keysNowPressed = keysDown();
@@ -263,27 +257,56 @@ void editSpriteData(u8* sptr, string sa, string sb, int spritenum)
 		}
 		textClearTransparent();
 	}
-	else if (spritedatastruct[spritenum].gsd && !isd)
+	else if (spritedatastruct[snum].gsd && !isd)
 	{	//Render the new way
+		iprintf("Rendering with sprdata.txt support :)\n");
 		ptr = sptr;
 		msg1 = sa;
 		msg2 = sb;
-	    
+		string tmp;
+		int values[8];
+		int oldvalue[8];
+	    	int i=0;
 		textScroll(0);
 		bool selecting = true;
+		for(i=0;i<=7;i++){
+			values[i]=getnybble(spritedatastruct[snum].nybble[i]);
+			iprintf("Current value for nybble %d, %s: %d\n",spritedatastruct[snum].nybble[i],&spritedatastruct[snum].heading[i][0],values[i]);
+		}
+		for(i=0;i<=7;i++){
+			oldvalue[i]=getnybble(spritedatastruct[snum].nybble[i]);
+		}
 		while(selecting){
 			textClearOpaque();
 			renderText(0, 0, 32, 1, msg1);
 			renderText(0, 1, 32, 0, msg2);
+			renderText(3, 22, 5, 0, "OK");
 			scanKeys();
 			if (keysDown() & KEY_TOUCH){
 				touchRead(&touch);	
 				int y = touch.py / 8;
 				if(y > 21) selecting = false;
+				else if (y>=2){
+					y-=2;
+					if (spritedatastruct[snum].type[y]==L_checkbox)
+						values[y]= !values[y];
+					y+=2;
+				}
+			}
+			for(i=0;i<=7;i++){
+				if (spritedatastruct[snum].type[i]==L_checkbox){
+					renderText(0,i+2,20,values[i],&spritedatastruct[snum].heading[i][0]);
+				}
 			}
 			oamFrame();
 			swiWaitForVBlank();
 		}
+		for (i=0;i<=7;i++){
+			if(values[i]!=oldvalue[i]){
+				setnybble(spritedatastruct[snum].nybble[i],values[i]);
+				iprintf("Setting nybble %d to  %d\n",spritedatastruct[snum].nybble[i],values[i]);
+			}
+		}	
 	}
 }
 
