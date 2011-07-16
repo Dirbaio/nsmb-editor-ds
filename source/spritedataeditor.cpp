@@ -41,11 +41,13 @@ namespace spritedataeditor
 	int curamount;
 	int format;
 	typedef struct{
-		char heading[8][20];
-		int take[8];
-		int subs[8];
+		char heading[8][40];
+		int headingsize[8];
+		int take[8]; 
+		int add[8];//Typo this is add will fix later...
 		int nybble[8];
 		int type[8];
+		bool twonybbles[8];
 		bool gsd;
 	}strdtal;
 	strdtal spritedatastruct[323];
@@ -72,7 +74,7 @@ void chboxread(int snum){
 	int mask=1;
 	int nybble;
 
-	char heading[20];
+	char heading[40];
 	if (fscanf(f,"%d",&nybble)!=EOF){
 		spritedatastruct[snum].nybble[curamount]=nybble;
 			printf("Nybble: %d\n",nybble);
@@ -94,19 +96,24 @@ void chboxread(int snum){
 		while(!(keysHeld() & KEY_A)) scanKeys();
 		isd=true;
 	}
-	fscanf(f,"%s",&heading[0]);
-	//fgets(&heading[0],20,f);
-	if (!(ferror(f) || feof(f))){
-		strcpy(spritedatastruct[snum].heading[curamount],heading);
-	}
-	else{
-		printf ("ERROR with chboxread()\n");
-		iprintf("\nPress A to continue!\n");
-		while(!(keysHeld() & KEY_A)) scanKeys();
-		isd=true;
-	}
+
+		if(fgets(&heading[0],40,f)!=NULL){
+			char tmp[40];
+			strcpy(tmp,heading);
+			int i=0;
+			for (i=0;i<=39;i++) // do not check the 40th because it will be '\0'... I think...
+				if (tmp[i]==';'){
+					tmp[i]='\0';
+					spritedatastruct[snum].headingsize[curamount]=i;
+					i=40;
+				}
+			strcpy(heading,tmp);
+		}
+		else isd=true;
+
+	strcpy(spritedatastruct[snum].heading[curamount],heading);
 	printf("Heading: %s\n",heading);
-	spritedatastruct[snum].type[curamount]=L_checkbox;
+	spritedatastruct[snum].type[curamount]=L_checkbox;	
 	curamount++;
 	spritedatastruct[snum].gsd=true;
 }
@@ -129,6 +136,43 @@ int GetSpriteNum(){
 	if (fscanf(f,"%d",&spritenum)!=EOF) return spritenum;
 	else return -1;
 }
+void numberread(int snum){
+	spritedatastruct[snum].nybble[curamount]=GetSpriteNum();
+	if (spritedatastruct[snum].nybble[curamount]==-1)
+		isd=true;
+	iprintf("Nybble:%d\n",spritedatastruct[snum].nybble[curamount]);
+	spritedatastruct[snum].add[curamount]=GetSpriteNum();
+	if (spritedatastruct[snum].add[curamount]==-1)
+		isd=true;
+	iprintf("Add:%d\n",spritedatastruct[snum].add[curamount]);
+	spritedatastruct[snum].take[curamount]=GetSpriteNum();
+	if (spritedatastruct[snum].take[curamount]==-1)
+		isd=true;
+	iprintf("Take:%d\n",spritedatastruct[snum].take[curamount]);
+	int c=fgetc(f);
+	if (c!=EOF)
+		if (c)
+			spritedatastruct[snum].twonybbles[curamount]=true;
+	char heading[40];
+		if(fgets(&heading[0],40,f)!=NULL){
+			char tmp[40];
+			strcpy(tmp,heading);
+			int i=0;
+			for (i=0;i<=39;i++) // do not check the 40th because it will be '\0'... I think...
+				if (tmp[i]==';'){
+					tmp[i]='\0';
+					spritedatastruct[snum].headingsize[curamount]=i;
+					i=40;
+				}
+			strcpy(heading,tmp);
+		}
+		else isd=true;
+	strcpy(spritedatastruct[snum].heading[curamount],&heading[0]);
+	printf("Heading: %s\n",heading);
+	spritedatastruct[snum].type[curamount]=L_number;	
+	curamount++;
+	spritedatastruct[snum].gsd=true;
+}
 bool ReadForSprite(){
 		char sprite[10];
 		if(fscanf(f,"%s",sprite)!=EOF){
@@ -147,10 +191,6 @@ void readSpriteData(const char* fname){
 			if (DEBUG) iprintf("Sprite number is: %d\n",snum);
 			while((type=GetType())!=L_end || isd){
 				if (type==0){
-					iprintf("\n\nAn entry in the sprdata.txt has an invalid type\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
-					iprintf("\nPress A to continue!\n");
-					iprintf("DEBUG: %d\n",type);
-					while(!(keysHeld() & KEY_A)) scanKeys();
 					isd=true;
 				}
 				else if (DEBUG) iprintf("GetType() returned: %d\n",type);
@@ -158,12 +198,20 @@ void readSpriteData(const char* fname){
 					chboxread(snum);
 
 				}
+				else if (type==L_number){
+					numberread(snum);
+				}
 			}
 		}
 		stop=true;
 		if (DEBUG) iprintf("DEBUG has beed set, Please press A.");
 		if (DEBUG) while(!(keysHeld() & KEY_A)) scanKeys();
-
+		if (isd){
+			iprintf("\n\nAn entry in the sprdata.txt is invalid\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
+			iprintf("\nPress A to continue!\n");
+			iprintf("DEBUG: %d\n",type);
+			while(!(keysHeld() & KEY_A)) scanKeys();
+		}
 }
 void renderSpriteData(int snum)
 {
@@ -295,7 +343,7 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 			}
 			for(i=0;i<=7;i++){
 				if (spritedatastruct[snum].type[i]==L_checkbox){
-					renderText(0,i+2,20,values[i],&spritedatastruct[snum].heading[i][0]);
+					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,values[i],&spritedatastruct[snum].heading[i][0]);
 				}
 			}
 			oamFrame();
@@ -306,7 +354,8 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 				setnybble(spritedatastruct[snum].nybble[i],values[i]);
 				iprintf("Setting nybble %d to  %d\n",spritedatastruct[snum].nybble[i],values[i]);
 			}
-		}	
+		}
+		textClearTransparent();
 	}
 }
 
