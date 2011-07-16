@@ -1,3 +1,4 @@
 sprite 231
-checkbox 8 1 Visable
+checkbox 8 1 Visable;
+number 9 0 0 1 Opacity;
 end

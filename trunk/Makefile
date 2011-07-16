@@ -25,7 +25,7 @@ GRAPHICS	:=	gfx
 
 GAME_TITLE     :=   NSMB Level Editor
 GAME_SUBTITLE1 :=	By Dirbaio
-GAME_SUBTITLE2 :=	jul.rustedlogic.net
+GAME_SUBTITLE2 :=	board.dirbaio.net
 
 #---------------------------------------------------------------------------------
 # options for code generation
