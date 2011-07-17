@@ -38,7 +38,7 @@
  37: Spiny
  38: Boo
  39: Boss Activator
- 40: Unused
+ 40: Unused Lakitu
  41: Bowser Battle P-Switch
  42: Chain Chomp / Log
  43: Chain Chomp without log
@@ -65,7 +65,7 @@
  64: Whomp
  65: Cheep Skipper
  66: P-Switch
- 67: Unknown, used in 1-A
+ 67: Shark (No generator)
  68: Vertical Moving Platform
  69: Horizontal Moving Platform
  70: Unused spinning log
@@ -81,9 +81,9 @@
  80: Vertical Platform Generator
  81: Unused
  82: Spinning Rectangle Platform
- 83: Unused
+ 83: Self-activating ?-Block
  84: Unused
- 85: Unused
+ 85: Small Fence Flip
  86: Spinning Triangle Platform
  87: Unused
  88: Brick With P-Switch
@@ -108,8 +108,8 @@
 107: Orange ? Switch
 108: Red ! Switch
 109: Electric Ball
-110: Unused
-111: Spinning Log
+110: Brick with Red ! Switch
+111: Giant Pink floating Log
 112: Unused / Nothing
 113: Cheep-Chomp
 114: Small flamethrower
@@ -138,19 +138,19 @@
 137: Unused
 138: Unused
 139: Unused
-140: Unused
+140: Glitched Boss key?
 141: Swelling Ground
 142: Tight Rope
-143: Unused
+143: Unused Rotating Spiked ? Block
 144: Rotating Spiked ? Block
-145: Rotating Spiked ? Block
+145: Unused Rotating Spiked ? Block
 146: Star Gate (Ground Pound)
 147: Bump from below Platform
 148: Goomba
 149: Koopa Troopa
 150: Koopa Paratroopa
 151: Unused
-152: Switch Block
+152: Event Activator/Deactivator Block
 153: Unused
 154: Unused
 155: Warp to Level
@@ -166,51 +166,51 @@
 165: Unused
 166: Unused
 167: Chained activators
-168: Activate activator on events
+168: Event Controller-"If" (Uses Locations)
 169: Unused
 170: Unused
 171: Unused
 172: Unused
 173: Rope
 174: Moving Mushroom
-175: Unused
+175: Unused Bouncing Bricks
 176: Unused
 177: Unused
 178: Unused
 179: Unused
-180: Fence Koopa
+180: Koopa on Fence
 181: Unused
 182: Unused
-183: Lakitu
+183: Lakitu Spawner
 184: Unused
-185: Unknown Sprite
+185: Random Cheep-Cheep Generator
 186: Paragoomba
 187: Manual Control Platform
 188: Unused
 189: Pipe cannon
 190: Unused
 191: Hanging Bouncing ? Block
-192: Unused
+192: Falling Coin
 193: Giant Dry Bones
 194: Giant Thwomp
 195: Scroll Controll??
 196: Scroll Controll??
-197: Block creator / destroyer
-198: Scrolling Control Left
-199: Scrolling Control Right
+197: Tile creator / destroyer
+198: Vertical scroll stop left limit
+199: Vertical scroll stop right limi
 200: Unused
 201: Unused
 202: Unused
-203: Unused
-204: Fire Snake
+203: Purple Tilting Mushroom
+204: Jumping Fire Snake
 205: Flame Chomp
-206: Moving Sloped Ghost House Goo
+206: Moving Sloped Ghost House Goo (16x3)
 207: Giant Cheep Cheep
 208: Unused
 209: Giant Hammer Bro
 210: Vs. Battle Star
 211: Blooper
-212: Unused
+212: Blooper Nanny
 213: Blooper, Mini-Blooper Spawn
 214: Unused
 215: Unused
@@ -218,7 +218,7 @@
 217: Unused
 218: Auto Scroll Start
 219: Spiny Beetle
-220: Bowser Jr.
+220: Bowser Jr. boss
 221: Unused
 222: Mini Goomba
 223: Flip Fence Side
@@ -245,7 +245,7 @@
 244: Bouncing Mushroom
 245: Swelling Tube
 246: Spinning Barrel
-247: Shark Generator??
+247: Shark Generator
 248: Balloon Boo
 249: Wall Jump Platform
 250: Crow
@@ -253,33 +253,33 @@
 252: Banzai Bill cannon
 253: Unused
 254: Kab-omb
-255: Unused
+255: Junglekusa (Unused Jungle Image)
 256: Rotating Carry-Through-Wall Platform
 257: Cheep-Cheep with coin trail
-258: Unused
+258: Unused Spike bass
 259: Poison Water
 260: Fast Giant Down Shooting Spike
 261: Fast Giant Up Shooting Spike
 262: Fast Giant Left Shooting Spike
 263: Fast Giant Right Shooting Spike
-264: Unknown Sprite
+264: Increase chance of drops on Mega-Mario groundpound
 265: Ghost House Pointing Hands
-266: Unused
+266: Invisible Fireball
 267: Unused
 268: Underwater Bounce Ball
 269: Giant Wiggler
-270: Unused
-271: Unused
+270: Pipe being smashed
+271: Crow Generator
 272: Falling Snow From Tree
 273: Snowball Thrower
 274: Sinking Snow
 275: Jumping ? Block
-276: Scroll stop?
+276: Scroll stop sideways
 277: Arrow
 278: Groundpound Ghost House Goo
 279: 1-Way Door
-280: Unknown Sprite (1-4 and Castles)
-281: Pipe caterpillar guy (7-A)
+280: Camera scroll slow stop?
+281: Squiggler
 282: Vine
 283: Spike Bass
 284: Pumpkin
@@ -290,12 +290,12 @@
 289: Expandable Block
 290: Left Flying ? Block
 291: Brick Block with ? Switch
-292: Door Appear with ? Switch
-293: Scroll Stop Downward??
-294: Scroll Stop Downward??
+292: Event Activated Door
+293: Scroll Stop Downward
+294: Scroll Stop Downward
 295: Mummy Pokey
-296: Unused
-297: Moving Stone Block 2 Sided
+296: Horizontal moving platform
+297: Moving Stone Block
 298: Moving stone block
 299: Moving Green Blocks
 300: Rising Ghost Platform

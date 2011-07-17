@@ -29,9 +29,9 @@
 1D: Toad House Fanfare
 1E: Multiplayer
 1F: Title Screen
-20: ??
-21: ??
-22: ??
+20: MvsL Loop
+21: MvsL Win
+22: MvsL Loose
 50: Bowser boss ambient noise
 51: Mummy-pokey boss ambient noise
 52: Big cheep-cheep ambient noise
