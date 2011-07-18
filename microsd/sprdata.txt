@@ -1,4 +1,69 @@
 sprite 231
 checkbox 8 1 Visable;
-number 9 0 0 1 Opacity;
+number 9 12 0 0 Opacity;
+end                                   
+sprite 22
+checkbox 7 1 Unknown;
+checkbox 4 1 Midway Point;
+checkbox 5 1 Unknown;
+end
+sprite 23
+checkbox 5 1 Fire-spitting;
+end
+sprite 24
+checkbox 5 1 Fire-spitting;
+end
+sprite 25
+checkbox 5 1 Fire-spitting;
+end
+sprite 26
+checkbox 5 1 Fire-spitting;
+end
+sprite 31
+checkbox 6 1 Slower;
+end
+sprite 32
+checkbox 9 1 Secret exit;
+end
+sprite 33
+checkbox 5 1 Giant;
+end
+sprite 37
+checkbox 7 3 Faster;
+end
+sprite 38
+checkbox 5 1 Faster;
+end
+sprite 40
+checkbox 7 1 Spawn from BG;
+end;
+sprite 41
+checkbox 8 1 Unknown flag 1;
+checkbox 4 1 Unknown flag 2;
+checkbox 5 1 Unknown flag 3;
+end
+sprite 42
+checkbox 5 1 Have Chain Chomp;
+end       
+sprite 57
+checkbox 8 1 Shift 1/2 block down;
+checkbox 11 1 Shift 1/2 block right;
+end
+sprite 64
+checkbox 4 1 Wait for you;
+checkbox 5 1 Giant;
+end
+sprite 66
+checkbox 5 1 Upside down;
+end
+sprite 70
+checkbox 5 1 Longer;
+end
+sprite 78
+checkbox 7 1 Event Activated;
+checkbox 8 1 Stop at top of screen?;
+end
+sprite 79
+checkbox 9 1 Clockwise rotation;
+checkbox 11 1 Slower;
 end

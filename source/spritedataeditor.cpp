@@ -46,8 +46,8 @@ namespace spritedataeditor
 		int take[8]; 
 		int add[8];//Typo this is add will fix later...
 		int nybble[8];
+		int nybble2[8];
 		int type[8];
-		bool twonybbles[8];
 		bool gsd;
 	}strdtal;
 	strdtal spritedatastruct[323];
@@ -65,7 +65,15 @@ using namespace spritedataeditor;
 #define L_end 7
 #define L_PC 8
 
-
+int twonytoint(int ny1, int ny2){
+	return ny1*16+ny2;	
+}
+int inttony1(int i){
+	return i%16;
+}
+int inttony2(int i){
+	return i-(inttony1(i))/16;
+}
 void chformat(){
 	if (fscanf(f,"%d",&format)==EOF)
 		isd=true;
@@ -141,6 +149,10 @@ void numberread(int snum){
 	if (spritedatastruct[snum].nybble[curamount]==-1)
 		isd=true;
 	iprintf("Nybble:%d\n",spritedatastruct[snum].nybble[curamount]);
+	spritedatastruct[snum].nybble2[curamount]=GetSpriteNum();
+	if (spritedatastruct[snum].nybble2[curamount]==-1)
+		isd=true;
+	iprintf("Nybble2:%d\n",spritedatastruct[snum].nybble2[curamount]);
 	spritedatastruct[snum].add[curamount]=GetSpriteNum();
 	if (spritedatastruct[snum].add[curamount]==-1)
 		isd=true;
@@ -149,10 +161,7 @@ void numberread(int snum){
 	if (spritedatastruct[snum].take[curamount]==-1)
 		isd=true;
 	iprintf("Take:%d\n",spritedatastruct[snum].take[curamount]);
-	int c=fgetc(f);
-	if (c!=EOF)
-		if (c)
-			spritedatastruct[snum].twonybbles[curamount]=true;
+
 	char heading[40];
 		if(fgets(&heading[0],40,f)!=NULL){
 			char tmp[40];
@@ -174,6 +183,7 @@ void numberread(int snum){
 	spritedatastruct[snum].gsd=true;
 }
 bool ReadForSprite(){
+		curamount=0;
 		char sprite[10];
 		if(fscanf(f,"%s",sprite)!=EOF){
 			if (strncmp (sprite,"sprite",6)==0) return true;
@@ -314,6 +324,8 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		string tmp;
 		int values[8];
 		int oldvalue[8];
+		int oldnybble2[8];
+		int nybble2[8];
 	    	int i=0;
 		textScroll(0);
 		bool selecting = true;
@@ -324,6 +336,14 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		for(i=0;i<=7;i++){
 			oldvalue[i]=getnybble(spritedatastruct[snum].nybble[i]);
 		}
+		for(i=0;i<=7;i++){
+				if (spritedatastruct[snum].type[i]==L_number && spritedatastruct[snum].nybble2[i]!=12){
+					nybble2[i]=getnybble(spritedatastruct[snum].nybble2[i]);
+					iprintf("Current value for nybble2 %d, %s: %d\n",spritedatastruct[snum].nybble2[i],&spritedatastruct[snum].heading[i][0],nybble2[i]);
+				}
+				oldnybble2[i]=nybble2[i];
+		}
+
 		while(selecting){
 			textClearOpaque();
 			renderText(0, 0, 32, 1, msg1);
@@ -344,6 +364,10 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 			for(i=0;i<=7;i++){
 				if (spritedatastruct[snum].type[i]==L_checkbox){
 					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,values[i],&spritedatastruct[snum].heading[i][0]);
+				}
+				else if (spritedatastruct[snum].type[i]==L_number){
+					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,0,&spritedatastruct[snum].heading[i][0]);
+					
 				}
 			}
 			oamFrame();
