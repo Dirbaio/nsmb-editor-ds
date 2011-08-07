@@ -27,6 +27,8 @@
 #include "ui.h"
 #include "objectlist.h"
 
+int speed;
+
 
 
 LevelEditor* editor;
@@ -45,6 +47,7 @@ LevelEditor::LevelEditor(string lev)
 	bgSetScroll(3, levelx%512, levely%512);
 	repaintScreen();
 	updateScroll();
+	speed = 2;
 }
 
 LevelEditor::~LevelEditor()
@@ -251,7 +254,6 @@ void LevelEditor::touchMoved(uint x, uint y)
 	
 	if(editAction == EDITACTION_SCROLL)
 	{
-		int speed = 2;
 		levelx += lax*speed;
 		levelx -= x*speed;
 		levely += lay*speed;
@@ -381,6 +383,31 @@ void LevelEditor::showProperties()
     
 }
 
+void LevelEditor::increaseSpeed()
+{
+    if (speed < 8)
+	{
+    speed = speed + 1;
+	}
+	else
+	{
+	iprintf("The camera is too fast!\n");
+	}
+	
+}
+
+void LevelEditor::decreaseSpeed()
+{
+    if (speed > 2)
+	{
+    speed = speed - 1;
+	}
+	else
+	{
+	iprintf("The camers is too slow!\n");
+    }
+	
+}
 void LevelEditor::showAbout()
 {
     consoleClear();

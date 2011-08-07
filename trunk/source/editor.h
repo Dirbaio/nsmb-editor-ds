@@ -80,6 +80,8 @@ class LevelEditor
     void showPalette();
     void showProperties();
 	void showAbout();
+	void increaseSpeed();
+	void decreaseSpeed();
     
     void unselectAll();
     bool elementInMultiRect(LevelElement& obj);
