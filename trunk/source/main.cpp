@@ -152,3 +152,4 @@ int main(void)
 //		renderRect(5, 5, 24, 56);
 	}
 }
+}
