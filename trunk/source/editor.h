@@ -79,6 +79,7 @@ class LevelEditor
     void deleteObjects();
     void showPalette();
     void showProperties();
+	void showAbout();
     
     void unselectAll();
     bool elementInMultiRect(LevelElement& obj);
