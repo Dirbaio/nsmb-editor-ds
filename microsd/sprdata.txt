@@ -6,6 +6,11 @@ sprite 22
 checkbox 7 1 Unknown;
 checkbox 4 1 Midway Point;
 checkbox 5 1 Unknown;
+end                                     
+Sprite 22
+checkbox 7 1 Unknown;
+checkbox 4 1 Midway Point;
+checkbox 5 1 Unknown;
 end
 sprite 23
 checkbox 5 1 Fire-spitting;
@@ -44,7 +49,7 @@ checkbox 5 1 Unknown flag 3;
 end
 sprite 42
 checkbox 5 1 Have Chain Chomp;
-end       
+end          
 sprite 57
 checkbox 8 1 Shift 1/2 block down;
 checkbox 11 1 Shift 1/2 block right;
@@ -66,4 +71,51 @@ end
 sprite 79
 checkbox 9 1 Clockwise rotation;
 checkbox 11 1 Slower;
+end
+sprite 80
+checkbox 10 1 Unknown flag;
+end
+sprite 88
+checkbox 7 1 Multi use;
+end
+sprite 90
+checkbox 5 1 Bigger;
+end
+Sprite 91
+checkbox 8 1 Wait for Mario;
+checkbox 9 1 Reversed direction;
+checkbox 10 1 Invisible?;
+end
+sprite 92
+checkbox 9 1 Moves Right;
+checkbox 4 1 Moves Left;
+checkbox 5 1 Non-Moving;
+end
+sprite 93
+checkbox 5 1 X-Flip;
+checkbox 9 1 Small;
+end
+sprite 94
+checkbox 5 1 Bigger;
+end
+sprite 99
+checkbox 8 1 Stick to line;
+checkbox 10 1 Needs activator;
+end
+sprite 102
+checkbox 4 1 Start going right;
+checkbox 7 1 Unknown flag;
+end
+sprite 105
+checkbox 5 1 Shrink Away when Stop;
+end
+sprite 107
+checkbox 5 1 Flip upside down;
+checkbox 7 1 Multi-use;
+checkbox 8 1 Never time out;
+checkbox 10 1 Affected by gravity;
+end
+sprite 108
+checkbox 5 1 Flip upside down;
+checkbox 7 1 Allow multiple hits;
 end

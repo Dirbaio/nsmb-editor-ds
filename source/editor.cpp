@@ -380,3 +380,14 @@ void LevelEditor::showProperties()
         }
     
 }
+
+void LevelEditor::showAbout()
+{
+    consoleClear();
+    iprintf("*********************\n");
+	iprintf("NSMBe for DS. Early developement version by Dirbaio\n");
+	iprintf("Press X for User Guide\n");	
+	iprintf("*********************\n");
+	
+}
+

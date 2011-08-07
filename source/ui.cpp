@@ -34,6 +34,7 @@ bool uiOn = false;
 #define BTN_PROPERTIES 8
 #define BTN_VIEW 10
 #define BTN_ZONE 11
+#define BTN_ABOUT 9
 #define BTN_EMPTY 17
 
 bool saving = false;
@@ -75,6 +76,8 @@ void renderUI()
 	
 	renderButton(7, BTN_DELETE, false);
 	
+	renderButton(9, BTN_ABOUT, false);
+	
 	renderButton(13, BTN_PROPERTIES, false);
 	renderButton(14, BTN_PALETTE, false);
 }
@@ -115,6 +118,8 @@ void uiTouchDown(int x, int y)
 		case 7:  editor->deleteObjects(); break;
 		case 13:  editor->showProperties(); break;
 		case 14:  editor->showPalette(); break;
+		
+		case 9: editor->showAbout(); break;
 	}
 	
 	renderUI();
