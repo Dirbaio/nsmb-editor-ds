@@ -249,16 +249,17 @@ void cloneSelected(list<T>& lst)
 
 void LevelEditor::touchMoved(uint x, uint y)
 {
+
 	tx = x+levelx;
 	ty = y+levely;
-	
+	textClearTransparent();
+	textScroll(0);
 	if(editAction == EDITACTION_SCROLL)
 	{
 		levelx += lax*speed;
 		levelx -= x*speed;
 		levely += lay*speed;
 		levely -= y*speed;
-
 		if(levelx<0) levelx = 0;
 		if(levely<0) levely = 0;
         updateScroll();
@@ -391,7 +392,10 @@ void LevelEditor::increaseSpeed()
 	}
 	else
 	{
-	iprintf("The camera is too fast!\n");
+		textClearTransparent();
+		textScroll(0);
+		renderText(0, 2, 32, 0,"The camera is too fast!");
+		//iprintf("The camera is too fast!\n");
 	}
 	
 }
@@ -404,7 +408,10 @@ void LevelEditor::decreaseSpeed()
 	}
 	else
 	{
-	iprintf("The camers is too slow!\n");
+		textClearTransparent();
+		textScroll(0);
+		renderText(0, 2, 32, 0,"The camera is too slow!");
+	//iprintf("The camers is too slow!\n");
     }
 	
 }
