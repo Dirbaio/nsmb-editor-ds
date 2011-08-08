@@ -130,8 +130,7 @@ void LevelEditor::doSelection(uint x, uint y)
 	
 	unselectAll();
 	
-    textClearTransparent();
-    textScroll(0);
+
 	if(elemAtCursor == NULL)
 	{
 		multiSelecting = true;
@@ -164,7 +163,11 @@ void LevelEditor::touchDown(uint x, uint y)
 		doSelection(tx, ty);
 		repaintScreen();
 	}
-	
+	else
+	{
+		textClearTransparent();
+		textScroll(0);
+	}
 	ltx = tx;
 	lty = ty;
 	lax = x;
@@ -252,8 +255,7 @@ void LevelEditor::touchMoved(uint x, uint y)
 
 	tx = x+levelx;
 	ty = y+levely;
-	textClearTransparent();
-	textScroll(0);
+
 	if(editAction == EDITACTION_SCROLL)
 	{
 		levelx += lax*speed;
@@ -394,7 +396,7 @@ void LevelEditor::increaseSpeed()
 	{
 		textClearTransparent();
 		textScroll(0);
-		renderText(0, 2, 32, 0,"The camera is too fast!");
+		renderText(0, 2, 32, 0,"The camera speed can not be raised!");
 		//iprintf("The camera is too fast!\n");
 	}
 	
@@ -410,7 +412,7 @@ void LevelEditor::decreaseSpeed()
 	{
 		textClearTransparent();
 		textScroll(0);
-		renderText(0, 2, 32, 0,"The camera is too slow!");
+		renderText(0, 2, 32, 0,"The camera speed can not be lowered!");
 	//iprintf("The camers is too slow!\n");
     }
 	
