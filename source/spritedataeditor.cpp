@@ -44,7 +44,7 @@ namespace spritedataeditor
 		char heading[8][40];
 		int headingsize[8];
 		int take[8]; 
-		int add[8];//Typo this is add will fix later...
+		int add[8];//What is this? //Typo this is add will fix later... :P
 		int nybble[8];
 		int nybble2[8];
 		int type[8];
@@ -322,10 +322,12 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		msg1 = sa;
 		msg2 = sb;
 		string tmp;
+		char buf[5];
 		int values[8];
 		int oldvalue[8];
 		int oldnybble2[8];
 		int nybble2[8];
+		char* output;
 	    	int i=0;
 		textScroll(0);
 		bool selecting = true;
@@ -335,13 +337,6 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		}
 		for(i=0;i<=7;i++){
 			oldvalue[i]=getnybble(spritedatastruct[snum].nybble[i]);
-		}
-		for(i=0;i<=7;i++){
-				if (spritedatastruct[snum].type[i]==L_number && spritedatastruct[snum].nybble2[i]!=12){
-					nybble2[i]=getnybble(spritedatastruct[snum].nybble2[i]);
-					iprintf("Current value for nybble2 %d, %s: %d\n",spritedatastruct[snum].nybble2[i],&spritedatastruct[snum].heading[i][0],nybble2[i]);
-				}
-				oldnybble2[i]=nybble2[i];
 		}
 
 		while(selecting){
@@ -367,7 +362,13 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 				}
 				else if (spritedatastruct[snum].type[i]==L_number){
 					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,0,&spritedatastruct[snum].heading[i][0]);
-					
+					renderChar(spritedatastruct[snum].headingsize[i]+1,i+2, 0, (char)30);
+
+					/* 
+					sprintf(buf, "%d", i);
+					strcat(output, buf);
+					renderText(spritedatastruct[snum].headingsize[i]+3,i+2,3,0,&buf[0]);*/
+					renderChar(spritedatastruct[snum].headingsize[i]+6,i+2, 0, (char)30);
 				}
 			}
 			oamFrame();
