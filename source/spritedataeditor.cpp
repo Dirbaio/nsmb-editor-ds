@@ -44,7 +44,7 @@ namespace spritedataeditor
 		char heading[8][40];
 		int headingsize[8];
 		int take[8]; 
-		int add[8];//What is this? //Typo this is add will fix later... :P
+		int add[8];
 		int nybble[8];
 		int nybble2[8];
 		int type[8];
@@ -327,7 +327,6 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		int oldvalue[8];
 		int oldnybble2[8];
 		int nybble2[8];
-		char* output;
 	    	int i=0;
 		textScroll(0);
 		bool selecting = true;
@@ -348,11 +347,16 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 			if (keysDown() & KEY_TOUCH){
 				touchRead(&touch);	
 				int y = touch.py / 8;
+				int x = touch.px / 8;
 				if(y > 21) selecting = false;
 				else if (y>=2){
 					y-=2;
 					if (spritedatastruct[snum].type[y]==L_checkbox)
 						values[y]= !values[y];
+					else if (spritedatastruct[snum].type[y]==L_number){
+						if (x==spritedatastruct[snum].headingsize[y]+1) values[y]++;
+						else if(x==spritedatastruct[snum].headingsize[y]+6) values[y]--;
+					}
 					y+=2;
 				}
 			}
@@ -363,12 +367,9 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 				else if (spritedatastruct[snum].type[i]==L_number){
 					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,0,&spritedatastruct[snum].heading[i][0]);
 					renderChar(spritedatastruct[snum].headingsize[i]+1,i+2, 0, (char)30);
-
-					/* 
-					sprintf(buf, "%d", i);
-					strcat(output, buf);
-					renderText(spritedatastruct[snum].headingsize[i]+3,i+2,3,0,&buf[0]);*/
-					renderChar(spritedatastruct[snum].headingsize[i]+6,i+2, 0, (char)30);
+					sprintf(buf, "%d", values[i]);
+					renderText(spritedatastruct[snum].headingsize[i]+3,i+2,3,0,&buf[0]);
+					renderChar(spritedatastruct[snum].headingsize[i]+6,i+2, 0, (char)31);
 				}
 			}
 			oamFrame();

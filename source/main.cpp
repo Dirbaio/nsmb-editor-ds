@@ -77,16 +77,14 @@ int main(void)
         while(1);
 	}
     
-    
-    textInit();
-    
-    loadLists();
-    
-    iprintf("Loading Rom!\n");
-    loadROM();
-		
+	    
+	textInit();
+	   
+	loadLists();
+	iprintf("Loading Rom!\n");
+	loadROM();
 	uiShow();
-    iprintf("Loading OAM!\n");
+	iprintf("Loading OAM!\n");
 	loadOAM();
 	bgInit(2, BgType_ExRotation, BgSize_ER_512x512, 0x10, 0);
 	bgShow(2);
@@ -99,7 +97,7 @@ int main(void)
 	bgUpdate();
 		
 	loadTilesets(0);
-    loadNewLevel();
+    	loadNewLevel();
 //	editor = new LevelEditor("A01_1");
 
 
@@ -125,31 +123,31 @@ int main(void)
 		swiWaitForVBlank();
 		if( keysNowPressed & KEY_X)
 		{
-            consoleClear();
-		    iprintf("  ***Press Y for second page***\n");
+			consoleClear();
+			iprintf("  ***Press Y for second page***\n");
 			iprintf("\n");
 			iprintf("1.Tap on the magnifying glass to activate the panning tool.\n");
 			iprintf("--------------------------------\n");
-            iprintf("2.The Button next to it, is for moving objects/sprites. Tap on a sprite/object and hold to move it arround.\n");
+			iprintf("2.The Button next to it, is for moving objects/sprites. Tap on a sprite/object and hold to move it arround.\n");
 			iprintf("--------------------------------\n");		    
 			iprintf("3.The icon with the 2 arrows let you resize a object. Tap on a  Obj. and hold down. Then move the Touchpen to resize it.\n");
 			iprintf("--------------------------------\n");		    
 			iprintf("4.The one with the 2 squares is for cloning objects/Sprites. Tap on a object/sprite and move the Touchpen while holding down, to clone it.\n");
 		 }
-		 if( keysNowPressed & KEY_Y)
+		else if( keysNowPressed & KEY_Y)
 		 {
 		 	consoleClear();
 			printf("1.The cross will let you delete objects/sprites/entrances.\n");
-	        iprintf("--------------------------------\n");
+	     		iprintf("--------------------------------\n");
 			printf("2.After that, you'll see the Sprite data editor button. Tap on a sprite and hit this button to edit the sprite data.\n");	
 			iprintf("--------------------------------\n");		    
 			printf("3.The last button is for changing object/sprite numbers mark your object/sprite and this button can help you changing it ;)\n");
 			iprintf("--------------------------------\n");		    
 			printf("***Hint! While holding the Touchpen down and move it around, you can mark more than one object/sprite**\n");
+			//renderSprite(10, 10, SpriteSize_16x16, 0, 0);
+			//renderSprite(30, 10, SpriteSize_16x16, 2, 2);
+			//renderRect(5, 5, 24, 56);
+		}
 		swiWaitForVBlank();
-//		renderSprite(10, 10, SpriteSize_16x16, 0, 0);
-//		renderSprite(30, 10, SpriteSize_16x16, 2, 2);
-//		renderRect(5, 5, 24, 56);
 	}
-}
 }
