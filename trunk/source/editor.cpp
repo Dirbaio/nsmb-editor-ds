@@ -416,7 +416,7 @@ void LevelEditor::decreaseSpeed()
 		textScroll(0);
 		renderText(0, 2, 32, 0,"The camera speed can not be");
 		renderText(0, 3, 32, 0,"lowered!");
-	//iprintf("The camers is too slow!\n");
+	//iprintf("The camera is too slow!\n");
     }
 	
 }

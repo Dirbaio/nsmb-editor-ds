@@ -137,13 +137,15 @@ int main(void)
 		else if( keysNowPressed & KEY_Y)
 		 {
 		 	consoleClear();
-			printf("1.The cross will let you delete objects/sprites/entrances.\n");
-	     		iprintf("--------------------------------\n");
-			printf("2.After that, you'll see the Sprite data editor button. Tap on a sprite and hit this button to edit the sprite data.\n");	
+			printf("5.The cross will let you delete objects/sprites/entrances.\n");
+	     	iprintf("--------------------------------\n");
+			iprintf("6.Now, two buttons with a pen. '+'=increase the camera scroll speed. '-'=decrease.\n");
+			iprintf("--------------------------------\n");					
+			printf("7.After that, you'll see the Sprite data editor button. Tap on a sprite and hit this button to edit the sprite data.\n");	
 			iprintf("--------------------------------\n");		    
-			printf("3.The last button is for changing object/sprite numbers mark your object/sprite and this button can help you changing it ;)\n");
+			printf("8.The last button is for changing object/sprite numbers mark your object/sprite and this button can help you changing it ;)\n");
 			iprintf("--------------------------------\n");		    
-			printf("***Hint! While holding the Touchpen down and move it around, you can mark more than one object/sprite**\n");
+			printf("*While holding the Touchpen down, you can mark more objects/sprites*");
 			//renderSprite(10, 10, SpriteSize_16x16, 0, 0);
 			//renderSprite(30, 10, SpriteSize_16x16, 2, 2);
 			//renderRect(5, 5, 24, 56);
