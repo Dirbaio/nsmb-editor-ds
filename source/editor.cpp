@@ -41,8 +41,7 @@ LevelEditor::LevelEditor(string lev)
 	iprintf("Level loaded. ");
 	levelx = 0;
 	levely = 0;
-	editAction = EDITACTION_SCROLL; // This needs a render.
-        renderUI();
+	editAction = EDITACTION_SCROLL; 
 	multiSelecting = false;
 	bgSetScroll(2, levelx%512, levely%512);
 	bgSetScroll(3, levelx%512, levely%512);

@@ -1,6 +1,7 @@
 sprite 231
 checkbox 8 1 Visable;
 number 9 12 0 0 Opacity;
+number 1 0 0 0 Triggering event;
 end                                   
 sprite 22
 checkbox 7 1 Unknown;

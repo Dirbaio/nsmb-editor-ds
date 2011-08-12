@@ -24,7 +24,7 @@
 #include <cstdio>
 #include "oamUtil.h"
 #include "lists.h"
-#define DEBUG true
+#define DEBUG false
 namespace spritedataeditor
 {
     touchPosition touch;
@@ -65,6 +65,31 @@ using namespace spritedataeditor;
 #define L_end 7
 #define L_PC 8
 
+u8 getnybble(int i)
+{
+    u8 n = ptr[i/2];
+    if(i % 2 == 0) return n >> 4;
+    else return n & 0xF;
+}
+
+void setnybble(int i, u8 nval)
+{
+    nval &= 0xF;
+    
+    u8 val = ptr[i/2];
+    if(i % 2 == 0)
+    {
+        val &= 0xF;
+        val |= nval << 4;
+    }
+    else
+    {
+        val &= 0xF0;
+        val |= nval;
+    }
+    ptr[i/2] = val;
+}
+/*
 int twonytoint(int ny1, int ny2){
 	return ny1*16+ny2;	
 }
@@ -73,10 +98,38 @@ int inttony1(int i){
 }
 int inttony2(int i){
 	return i-(inttony1(i))/16;
-}
+}*/ //KK
+/*
 void chformat(){
 	if (fscanf(f,"%d",&format)==EOF)
 		isd=true;
+}*///Not needed
+
+int getnybbles(int nybble1,int nybble2){
+	if (nybble2==12)
+			return getnybble(nybble1);
+	else {
+		int y;
+		int x;
+		y=getnybble(nybble1);
+		x=getnybble(nybble2);
+		return x*16+y;
+	}
+}
+void setnybbles (int nybble1, int nybble2, int value){
+	if (nybble2!=12){
+		int x;
+		int y;
+		x=value/16;
+		y=value-(x*16);//No x*16 does NOT make scense
+		printf("%d : %d,%d\n",value,x,y);
+		setnybble(nybble1,y);
+		setnybble(nybble2,x);
+
+	}
+	else if (nybble2==12){
+		setnybble(nybble1,value);
+	}
 }
 void chboxread(int snum){
 	int mask=1;
@@ -85,22 +138,19 @@ void chboxread(int snum){
 	char heading[40];
 	if (fscanf(f,"%d",&nybble)!=EOF){
 		spritedatastruct[snum].nybble[curamount]=nybble;
-			printf("Nybble: %d\n",nybble);
 	}
 	else {
-		printf ("ERROR with chboxread()\n");
-		iprintf("\nPress A to continue!\n");
+		printf("\nPress A to continue!\n");
 		while(!(keysHeld() & KEY_A)) scanKeys();
 		isd=true;
 	}
 	if (fscanf(f,"%d",&mask)!=EOF){
 		spritedatastruct[snum].take[curamount]=mask;
-		printf("Mask: %d\n",mask);
 
 	}
 	else{
 		printf ("ERROR with chboxread()\n");
-		iprintf("\nPress A to continue!\n");
+		printf("\nPress A to continue!\n");
 		while(!(keysHeld() & KEY_A)) scanKeys();
 		isd=true;
 	}
@@ -120,7 +170,6 @@ void chboxread(int snum){
 		else isd=true;
 
 	strcpy(spritedatastruct[snum].heading[curamount],heading);
-	printf("Heading: %s\n",heading);
 	spritedatastruct[snum].type[curamount]=L_checkbox;	
 	curamount++;
 	spritedatastruct[snum].gsd=true;
@@ -148,19 +197,19 @@ void numberread(int snum){
 	spritedatastruct[snum].nybble[curamount]=GetSpriteNum();
 	if (spritedatastruct[snum].nybble[curamount]==-1)
 		isd=true;
-	iprintf("Nybble:%d\n",spritedatastruct[snum].nybble[curamount]);
+	printf("Nybble:%d\n",spritedatastruct[snum].nybble[curamount]);
 	spritedatastruct[snum].nybble2[curamount]=GetSpriteNum();
 	if (spritedatastruct[snum].nybble2[curamount]==-1)
 		isd=true;
-	iprintf("Nybble2:%d\n",spritedatastruct[snum].nybble2[curamount]);
+	printf("Nybble2:%d\n",spritedatastruct[snum].nybble2[curamount]);
 	spritedatastruct[snum].add[curamount]=GetSpriteNum();
 	if (spritedatastruct[snum].add[curamount]==-1)
 		isd=true;
-	iprintf("Add:%d\n",spritedatastruct[snum].add[curamount]);
+	printf("Add:%d\n",spritedatastruct[snum].add[curamount]);
 	spritedatastruct[snum].take[curamount]=GetSpriteNum();
 	if (spritedatastruct[snum].take[curamount]==-1)
 		isd=true;
-	iprintf("Take:%d\n",spritedatastruct[snum].take[curamount]);
+	printf("Take:%d\n",spritedatastruct[snum].take[curamount]);
 
 	char heading[40];
 		if(fgets(&heading[0],40,f)!=NULL){
@@ -193,17 +242,13 @@ bool ReadForSprite(){
 void readSpriteData(const char* fname){
 	int type,snum;
 	f=fopen("sprdata.txt", "rb");
-	bool stop=false;
-	chformat();
+	//chformat(); What is this used for goldenscruff ????? xDs
 		while (ReadForSprite()){
-			if (DEBUG) iprintf("Found Sprite\n");
 			snum=GetSpriteNum();
-			if (DEBUG) iprintf("Sprite number is: %d\n",snum);
 			while((type=GetType())!=L_end || isd){
 				if (type==0){
 					isd=true;
 				}
-				else if (DEBUG) iprintf("GetType() returned: %d\n",type);
 				if (type==L_checkbox){
 					chboxread(snum);
 
@@ -213,15 +258,13 @@ void readSpriteData(const char* fname){
 				}
 			}
 		}
-		stop=true;
-		if (DEBUG) iprintf("DEBUG has beed set, Please press A.");
-		if (DEBUG) while(!(keysHeld() & KEY_A)) scanKeys();
 		if (isd){
-			iprintf("\n\nAn entry in the sprdata.txt is invalid\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
-			iprintf("\nPress A to continue!\n");
-			iprintf("DEBUG: %d\n",type);
+			printf("\n\nAn entry in the sprdata.txt is invalid\nYou can continue but must run\nthe editor in a hex-only sprite data editor.");
+			printf("\nPress A to continue!\n");
+			printf("DEBUG: %d\n",type);
 			while(!(keysHeld() & KEY_A)) scanKeys();
 		}
+		//setnybbles(1,0,90);
 }
 void renderSpriteData(int snum)
 {
@@ -242,30 +285,6 @@ void renderSpriteData(int snum)
 
 }	
 
-u8 getnybble(int i)
-{
-    u8 n = ptr[i/2];
-    if(i % 2 == 0) return n >> 4;
-    else return n & 0xF;
-}
-
-void setnybble(int i, u8 nval)
-{
-    nval &= 0xF;
-    
-    u8 val = ptr[i/2];
-    if(i % 2 == 0)
-    {
-        val &= 0xF;
-        val |= nval << 4;
-    }
-    else
-    {
-        val &= 0xF0;
-        val |= nval;
-    }
-    ptr[i/2] = val;
-}
 
 void editSpriteData(u8* sptr, string sa, string sb, int snum)
 {
@@ -317,7 +336,7 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 	}
 	else if (spritedatastruct[snum].gsd && !isd)
 	{	//Render the new way
-		iprintf("Rendering with sprdata.txt support :)\n");
+		//printf("Rendering with sprdata.txt support :)\n");
 		ptr = sptr;
 		msg1 = sa;
 		msg2 = sb;
@@ -331,11 +350,11 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		textScroll(0);
 		bool selecting = true;
 		for(i=0;i<=7;i++){
-			values[i]=getnybble(spritedatastruct[snum].nybble[i]);
-			iprintf("Current value for nybble %d, %s: %d\n",spritedatastruct[snum].nybble[i],&spritedatastruct[snum].heading[i][0],values[i]);
+			values[i]=getnybbles(spritedatastruct[snum].nybble[i],spritedatastruct[snum].nybble2[i]);
+			//printf("Current value for nybble %d, %s: %d\n",spritedatastruct[snum].nybble[i],&spritedatastruct[snum].heading[i][0],values[i]);
 		}
 		for(i=0;i<=7;i++){
-			oldvalue[i]=getnybble(spritedatastruct[snum].nybble[i]);
+			oldvalue[i]=getnybbles(spritedatastruct[snum].nybble[i],spritedatastruct[snum].nybble2[i]);
 		}
 
 		while(selecting){
@@ -377,8 +396,8 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		}
 		for (i=0;i<=7;i++){
 			if(values[i]!=oldvalue[i]){
-				setnybble(spritedatastruct[snum].nybble[i],values[i]);
-				iprintf("Setting nybble %d to  %d\n",spritedatastruct[snum].nybble[i],values[i]);
+				setnybbles(spritedatastruct[snum].nybble[i],spritedatastruct[snum].nybble2[i],values[i]);
+				//printf("Setting nybble %d to  %d\n",spritedatastruct[snum].nybble[i],values[i]);
 			}
 		}
 		textClearTransparent();
