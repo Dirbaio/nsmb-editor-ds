@@ -171,6 +171,7 @@ void chboxread(int snum){
 
 	strcpy(spritedatastruct[snum].heading[curamount],heading);
 	spritedatastruct[snum].type[curamount]=L_checkbox;	
+	spritedatastruct[snum].nybble2[curamount]=12;
 	curamount++;
 	spritedatastruct[snum].gsd=true;
 }
@@ -245,6 +246,7 @@ void readSpriteData(const char* fname){
 	//chformat(); What is this used for goldenscruff ????? xDs
 		while (ReadForSprite()){
 			snum=GetSpriteNum();
+			spritedatastruct[snum].gsd=true;
 			while((type=GetType())!=L_end || isd){
 				if (type==0){
 					isd=true;
@@ -288,6 +290,7 @@ void renderSpriteData(int snum)
 
 void editSpriteData(u8* sptr, string sa, string sb, int snum)
 {
+	printf("%d ,%d\n",spritedatastruct[snum].gsd, isd); //DEBUG STUFF????!?!?! :( :) :P :O O0OoO
 	if (!spritedatastruct[snum].gsd || isd)
 	{
 		ptr = sptr;
@@ -336,7 +339,7 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 	}
 	else if (spritedatastruct[snum].gsd && !isd)
 	{	//Render the new way
-		//printf("Rendering with sprdata.txt support :)\n");
+		printf("Rendering with sprdata.txt support :)\n");
 		ptr = sptr;
 		msg1 = sa;
 		msg2 = sb;
@@ -351,7 +354,7 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		bool selecting = true;
 		for(i=0;i<=7;i++){
 			values[i]=getnybbles(spritedatastruct[snum].nybble[i],spritedatastruct[snum].nybble2[i]);
-			//printf("Current value for nybble %d, %s: %d\n",spritedatastruct[snum].nybble[i],&spritedatastruct[snum].heading[i][0],values[i]);
+			printf("Current value for nybble %d, %s: %d\n",spritedatastruct[snum].nybble[i],&spritedatastruct[snum].heading[i][0],values[i]);
 		}
 		for(i=0;i<=7;i++){
 			oldvalue[i]=getnybbles(spritedatastruct[snum].nybble[i],spritedatastruct[snum].nybble2[i]);

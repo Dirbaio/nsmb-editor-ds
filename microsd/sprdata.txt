@@ -7,11 +7,6 @@ sprite 22
 checkbox 7 1 Unknown;
 checkbox 4 1 Midway Point;
 checkbox 5 1 Unknown;
-end                                     
-Sprite 22
-checkbox 7 1 Unknown;
-checkbox 4 1 Midway Point;
-checkbox 5 1 Unknown;
 end
 sprite 23
 checkbox 5 1 Fire-spitting;
@@ -42,7 +37,7 @@ checkbox 5 1 Faster;
 end
 sprite 40
 checkbox 7 1 Spawn from BG;
-end;
+end
 sprite 41
 checkbox 8 1 Unknown flag 1;
 checkbox 4 1 Unknown flag 2;
@@ -82,7 +77,7 @@ end
 sprite 90
 checkbox 5 1 Bigger;
 end
-Sprite 91
+sprite 91
 checkbox 8 1 Wait for Mario;
 checkbox 9 1 Reversed direction;
 checkbox 10 1 Invisible?;
