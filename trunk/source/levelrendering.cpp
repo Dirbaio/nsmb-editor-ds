@@ -459,20 +459,32 @@ void renderSprites(Level* l)
 {
 	for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); ++i)
 	{
+		int sprNum = i->spriteNum;
 		if(!onScreen(*i)) continue;
 		
 		renderingSelected = i->selected;
+		
+		if (sprNum == 148){
+			setTileXYb(i->x*2,   i->y*2,   0x3F0);
+		    setTileXYb(i->x*2+1, i->y*2,   0x3F1);
+		    setTileXYb(i->x*2,   i->y*2+1, 0x3F2);
+		    setTileXYb(i->x*2+1, i->y*2+1, 0x3F3);
+			}
+		else{
 		
 		setTileXY(i->x*2,   i->y*2,   0x3D4 | 1<<14);
 		setTileXY(i->x*2+1, i->y*2,   0x3D5 | 1<<14);
 		setTileXY(i->x*2,   i->y*2+1, 0x3D6 | 1<<14);
 		setTileXY(i->x*2+1, i->y*2+1, 0x3D7 | 1<<14);
 		
-		int sprNum = i->spriteNum;
 		setTileXYb(i->x*2,   i->y*2,   0x3DC + sprNum / 1000 % 10);
 		setTileXYb(i->x*2+1, i->y*2,   0x3DC + sprNum / 100 % 10);
 		setTileXYb(i->x*2,   i->y*2+1, 0x3DC + sprNum / 10 % 10);
 		setTileXYb(i->x*2+1, i->y*2+1, 0x3DC + sprNum / 1 % 10);
+		}
+
+
+		
 	}
 
 }
