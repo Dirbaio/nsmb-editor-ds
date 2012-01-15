@@ -17,6 +17,7 @@
 
 
 #include "levelrendering.h"
+#include "sprites.h"
 
 int xMin, xMax, yMin, yMax;
 bool renderingSelected;
@@ -464,12 +465,7 @@ void renderSprites(Level* l)
 		
 		renderingSelected = i->selected;
 		
-		if (sprNum == 148){
-			setTileXYb(i->x*2,   i->y*2,   0x3F0);
-		    setTileXYb(i->x*2+1, i->y*2,   0x3F1);
-		    setTileXYb(i->x*2,   i->y*2+1, 0x3F2);
-		    setTileXYb(i->x*2+1, i->y*2+1, 0x3F3);
-			}
+		if (sprNum == 148){ addGoomba();}
 		else{
 		
 		setTileXY(i->x*2,   i->y*2,   0x3D4 | 1<<14);
