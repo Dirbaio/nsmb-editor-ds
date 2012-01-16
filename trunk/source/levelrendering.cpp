@@ -17,7 +17,6 @@
 
 
 #include "levelrendering.h"
-#include "sprites.h"
 
 int xMin, xMax, yMin, yMax;
 bool renderingSelected;
@@ -465,7 +464,30 @@ void renderSprites(Level* l)
 		
 		renderingSelected = i->selected;
 		
-		if (sprNum == 148){ addGoomba();}
+		if (sprNum == 148){
+			setTileXYb(i->x*2,   i->y*2,   0x3F0);
+		    setTileXYb(i->x*2+1, i->y*2,   0x3F1);
+		    setTileXYb(i->x*2,   i->y*2+1, 0x3F2);
+		    setTileXYb(i->x*2+1, i->y*2+1, 0x3F3);
+			}
+		else if (sprNum == 66){
+			setTileXYb(i->x*2,   i->y*2,   0x3F4);
+		    setTileXYb(i->x*2+1, i->y*2,   0x3F5);
+		    setTileXYb(i->x*2,   i->y*2+1, 0x3F6);
+		    setTileXYb(i->x*2+1, i->y*2+1, 0x3F7);	
+            }	
+		else if (sprNum == 28){
+			setTileXYb(i->x*2,   i->y*2,   0x3F8);
+		    setTileXYb(i->x*2+1, i->y*2,   0x3F9);
+		    setTileXYb(i->x*2,   i->y*2+1, 0x3FA);
+		    setTileXYb(i->x*2+1, i->y*2+1, 0x3FB);	
+            }	
+		else if (sprNum == 33){
+			setTileXYb(i->x*2,   i->y*2,   0x3FC);
+		    setTileXYb(i->x*2+1, i->y*2,   0x3FD);
+		    setTileXYb(i->x*2,   i->y*2+1, 0x3FE);
+		    setTileXYb(i->x*2+1, i->y*2+1, 0x3FF);	
+            }	
 		else{
 		
 		setTileXY(i->x*2,   i->y*2,   0x3D4 | 1<<14);
@@ -480,7 +502,7 @@ void renderSprites(Level* l)
 		}
 
 
-		
+
 	}
 
 }
