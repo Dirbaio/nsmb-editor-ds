@@ -411,6 +411,26 @@ void renderLevelSprites(Level* l, uint xMins, uint xMaxs, uint yMins, uint yMaxs
 		    renderSprite(i->x-xMin, i->y-yMin, SpriteSize_16x16, 0);
 		}
 	}
+	
+	for(list<LevelSprite>::iterator i = l->sprites.begin(); i != l->sprites.end(); ++i)
+	{
+		if(onScreen(*i))
+		{
+		if (i->spriteNum == 148){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 8); //Goomba
+		}
+	    else if (i->spriteNum == 52){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 5); //Buzzy-Beetle
+		}
+	    else if (i->spriteNum == 33){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 7); //Springboard
+		}
+	    else if (i->spriteNum == 66){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 6); //P-Switch
+		}
+
+	 }
+   }
 }
 
 void renderTileLineVert(int x, int y, int linetile)
@@ -464,30 +484,12 @@ void renderSprites(Level* l)
 		
 		renderingSelected = i->selected;
 		
-		if (sprNum == 148){
-			setTileXYb(i->x*2,   i->y*2,   0x3F0);
-		    setTileXYb(i->x*2+1, i->y*2,   0x3F1);
-		    setTileXYb(i->x*2,   i->y*2+1, 0x3F2);
-		    setTileXYb(i->x*2+1, i->y*2+1, 0x3F3);
-			}
-		else if (sprNum == 66){
-			setTileXYb(i->x*2,   i->y*2,   0x3F4);
-		    setTileXYb(i->x*2+1, i->y*2,   0x3F5);
-		    setTileXYb(i->x*2,   i->y*2+1, 0x3F6);
-		    setTileXYb(i->x*2+1, i->y*2+1, 0x3F7);	
-            }	
-		else if (sprNum == 28){
-			setTileXYb(i->x*2,   i->y*2,   0x3F8);
-		    setTileXYb(i->x*2+1, i->y*2,   0x3F9);
-		    setTileXYb(i->x*2,   i->y*2+1, 0x3FA);
-		    setTileXYb(i->x*2+1, i->y*2+1, 0x3FB);	
-            }	
-		else if (sprNum == 33){
-			setTileXYb(i->x*2,   i->y*2,   0x3FC);
-		    setTileXYb(i->x*2+1, i->y*2,   0x3FD);
-		    setTileXYb(i->x*2,   i->y*2+1, 0x3FE);
-		    setTileXYb(i->x*2+1, i->y*2+1, 0x3FF);	
-            }	
+		if (sprNum == 28){}	  //Bob-Omb
+		else if (sprNum == 33){} //Springboard	
+		else if (sprNum == 52){} //Buzy-Beetle
+		else if (sprNum == 57){} //Coin
+		else if (sprNum == 66){} //P-Switch
+		else if (sprNum == 148){} //Goomba	
 		else{
 		
 		setTileXY(i->x*2,   i->y*2,   0x3D4 | 1<<14);
