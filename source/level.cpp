@@ -17,6 +17,7 @@
 
 
 #include "level.h"
+#include "levelrendering.h"
 
 inline u32 min(u32 a, u32 b)
 {
@@ -214,7 +215,34 @@ void Level::loadEntrances()
 }
 void Level::saveEntrances()
 {
-
+    /*uint8* block = new u8[entrances.size()*12 + 2];
+    int filePos = 0;
+    
+    for(list<LevelEntrance>::iterator it = entrances.begin(); it != entrances.end(); it++)
+    {
+        LevelEntrance& e = *it;
+        block[filePos ++] = (u8) (e.x >> 8);
+        block[filePos ++] = (u8) (e.y >> 8);
+        block[filePos ++] = (u8) (e.cameraX >> 8);
+        block[filePos ++] = (u8) (e.cameraY >> 8);
+        block[filePos ++] = e.number;
+        block[filePos ++] = e.destArea;
+        block[filePos ++] = e.pipeID;
+        block[filePos ++] = e.destEntrance;
+        block[filePos ++] = e.type;
+        //block[filePos + 15] = e.settings;
+        //block[filePos + 16] = e.Unknown1;
+        block[filePos ++] = e.destView;
+        //block[filePos + 19] = e.Unknown2;
+    }
+    
+    block[filePos++] = 0xFF;
+    block[filePos++] = 0xFF;
+    
+    if(levelBlocks[5])
+        delete[] levelBlocks[5];
+    levelBlocks[5] = block;
+    levelBlocksLen[5] = entrances.size()*12 + 2;*/
 }
 
 Level::Level(string pf)

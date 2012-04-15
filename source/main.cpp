@@ -115,6 +115,22 @@ int main(void)
 	while(1)
 	{
 		checkControls();
+		
+		
+		if(keysNowPressed & KEY_UP) editor->editAction = EDITACTION_MOVE; 
+		if(keysNowPressed & KEY_LEFT) editor->editAction = EDITACTION_SCROLL;
+		if(keysNowPressed & KEY_RIGHT) editor->editAction = EDITACTION_RESIZE;  
+        if(keysNowPressed & KEY_DOWN) editor->editAction = EDITACTION_CLONE; 
+		
+		if(keysNowPressed & KEY_X) editor->editAction = EDITACTION_MOVE; 
+		if(keysNowPressed & KEY_Y) editor->editAction = EDITACTION_SCROLL;
+		if(keysNowPressed & KEY_A) editor->editAction = EDITACTION_RESIZE;  
+        if(keysNowPressed & KEY_B) editor->editAction = EDITACTION_CLONE;
+
+       
+   renderUI(); 
+
+		
 		if(keysNowPressed & KEY_START)
 		    loadNewLevel();
 		    

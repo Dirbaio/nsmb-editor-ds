@@ -24,7 +24,7 @@ void loadOAM()
 {
 	//initialize the sub sprite engine with 1D mapping 128 byte boundary
 	//and no external palette support
-	oamInit(&oamMain, SpriteMapping_1D_256 , true);
+	oamInit(&oamMain, SpriteMapping_1D_128 , true);
 	
 	cpuCopy16(&oamGfxTiles, SPRITE_GFX, oamGfxTilesLen);
     
