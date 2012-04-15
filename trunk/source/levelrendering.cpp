@@ -416,17 +416,68 @@ void renderLevelSprites(Level* l, uint xMins, uint xMaxs, uint yMins, uint yMaxs
 	{
 		if(onScreen(*i))
 		{
-		if (i->spriteNum == 148){
-		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 8); //Goomba
+		if (i->spriteNum == 27){
+            renderSprite(i->x*16-xMin, i->y*16-yMin-16, SpriteSize_16x32, 52); //Bullet-Bill Launcher 
 		}
-	    else if (i->spriteNum == 52){
-		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 5); //Buzzy-Beetle
+		else if (i->spriteNum == 28){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 20); //Bob-Omb
+		}
+		else if (i->spriteNum == 31){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 50); //Cheep-Cheep
 		}
 	    else if (i->spriteNum == 33){
-		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 7); //Springboard
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 22); //Springboard
+		}
+	    else if (i->spriteNum == 36){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_32x32, 54); //Thwomp 
+		}
+	    else if (i->spriteNum == 37){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 56); //Spiny
+		}
+	    else if (i->spriteNum == 38){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_32x32, 58); //Boo
+		}
+	    else if (i->spriteNum == 40){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_32x64, 60); //Lakitu 
+		}
+	    else if (i->spriteNum == 42){
+		    renderSprite(i->x*16-xMin-48, i->y*16-yMin-48, SpriteSize_64x64, 64); //Chain-Chomp with log
+		}
+	    else if (i->spriteNum == 52){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 24); //Buzzy-Beetle
+		}
+	    else if (i->spriteNum == 57){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 26); //Coin
 		}
 	    else if (i->spriteNum == 66){
-		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 6); //P-Switch
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 28); //P-Switch
+		}
+		else if (i->spriteNum == 88){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 32); //Brick with P-Switch
+		}
+		else if (i->spriteNum == 94){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 34); //Swooper
+		}
+		else if (i->spriteNum == 106){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 36); //Red Coin
+		}
+		else if (i->spriteNum == 107){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 38); //?-Switch
+		}
+		else if (i->spriteNum == 108){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 40); //!-Switch
+		}
+		else if (i->spriteNum == 110){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 42); //Brick with !-Switch
+		}
+		else if (i->spriteNum == 235){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_32x32, 44); //Star Coin !!!Can only get accessed by tapping on top-left corner!!!
+		}
+		else if (i->spriteNum == 116){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_64x32, 46); //Water-Bug !!!Can only get accessed by tapping on top-left corner!!!
+		}
+		else if (i->spriteNum == 148){
+		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 30); //Goomba
 		}
 
 	 }

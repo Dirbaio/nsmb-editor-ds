@@ -84,6 +84,7 @@ void renderUI()
 	
 	renderButton(13, BTN_PROPERTIES, false);
 	renderButton(14, BTN_PALETTE, false);
+	
 }
 
 void uiShow()
