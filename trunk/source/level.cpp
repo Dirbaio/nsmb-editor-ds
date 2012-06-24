@@ -215,7 +215,7 @@ void Level::loadEntrances()
 }
 void Level::saveEntrances()
 {
-    uint8* block = new u8[entrances.size()*12 + 2];
+    uint8* block = new u8[entrances.size()*20 + 2];
     int filePos = 0;
     
     for(list<LevelEntrance>::iterator it = entrances.begin(); it != entrances.end(); it++)
@@ -248,7 +248,7 @@ void Level::saveEntrances()
     if(levelBlocks[5])
         delete[] levelBlocks[5];
     levelBlocks[5] = block;
-    levelBlocksLen[5] = entrances.size()*12 + 2;
+    levelBlocksLen[5] = entrances.size()*20 + 2;
 }
 
 Level::Level(string pf)
