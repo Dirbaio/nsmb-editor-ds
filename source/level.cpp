@@ -215,25 +215,31 @@ void Level::loadEntrances()
 }
 void Level::saveEntrances()
 {
-    /*uint8* block = new u8[entrances.size()*12 + 2];
+    uint8* block = new u8[entrances.size()*12 + 2];
     int filePos = 0;
     
     for(list<LevelEntrance>::iterator it = entrances.begin(); it != entrances.end(); it++)
     {
         LevelEntrance& e = *it;
-        block[filePos ++] = (u8) (e.x >> 8);
-        block[filePos ++] = (u8) (e.y >> 8);
-        block[filePos ++] = (u8) (e.cameraX >> 8);
-        block[filePos ++] = (u8) (e.cameraY >> 8);
-        block[filePos ++] = e.number;
-        block[filePos ++] = e.destArea;
-        block[filePos ++] = e.pipeID;
-        block[filePos ++] = e.destEntrance;
-        block[filePos ++] = e.type;
+        block[filePos] = (u8) (e.x & 0xFF);
+		block[filePos+1] = (u8) (e.x >> 8);
+		block[filePos+2] = (u8) (e.y & 0xFF);
+		block[filePos+3] = (u8) (e.y >> 8);
+		block[filePos+4] = (u8) (e.cameraX & 0xFF);
+		block[filePos+5] = (u8) (e.cameraX >> 8);
+		block[filePos+6] = (u8) (e.cameraY & 0xFF);
+		block[filePos+7] = (u8) (e.cameraY >> 8);
+        block[filePos+8] = e.number;
+        block[filePos+9] = e.destArea;
+        block[filePos+10] = e.pipeID;
+        block[filePos+12] = e.destEntrance;
+        block[filePos+14] = e.type;
         //block[filePos + 15] = e.settings;
         //block[filePos + 16] = e.Unknown1;
-        block[filePos ++] = e.destView;
+        block[filePos+18] = e.destView;
         //block[filePos + 19] = e.Unknown2;
+		filePos+=20;
+		iprintf("%d %d %d ",e.x,block[filePos],block[filePos+1]);
     }
     
     block[filePos++] = 0xFF;
@@ -242,7 +248,7 @@ void Level::saveEntrances()
     if(levelBlocks[5])
         delete[] levelBlocks[5];
     levelBlocks[5] = block;
-    levelBlocksLen[5] = entrances.size()*12 + 2;*/
+    levelBlocksLen[5] = entrances.size()*12 + 2;
 }
 
 Level::Level(string pf)
