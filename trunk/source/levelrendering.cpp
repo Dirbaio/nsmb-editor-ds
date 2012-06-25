@@ -416,7 +416,7 @@ void renderLevelSprites(Level* l, uint xMins, uint xMaxs, uint yMins, uint yMaxs
 	{
 		if(onScreen(*i))
 		{
-		if (i->spriteNum == 27){
+		/*if (i->spriteNum == 27){ //This code doesn't work properly anymore!
             renderSprite(i->x*16-xMin, i->y*16-yMin-16, SpriteSize_16x32, 52); //Bullet-Bill Launcher 
 		}
 		else if (i->spriteNum == 28){
@@ -478,7 +478,7 @@ void renderLevelSprites(Level* l, uint xMins, uint xMaxs, uint yMins, uint yMaxs
 		}
 		else if (i->spriteNum == 148){
 		    renderSprite(i->x*16-xMin, i->y*16-yMin, SpriteSize_16x16, 30); //Goomba
-		}
+		}*/
 
 	 }
    }
@@ -535,13 +535,13 @@ void renderSprites(Level* l)
 		
 		renderingSelected = i->selected;
 		
-		if (sprNum == 28){}	  //Bob-Omb
+		/*if (sprNum == 28){}	  //Bob-Omb
 		else if (sprNum == 33){} //Springboard	
 		else if (sprNum == 52){} //Buzy-Beetle
 		else if (sprNum == 57){} //Coin
 		else if (sprNum == 66){} //P-Switch
 		else if (sprNum == 148){} //Goomba	
-		else{
+		else{*/
 		
 		setTileXY(i->x*2,   i->y*2,   0x3D4 | 1<<14);
 		setTileXY(i->x*2+1, i->y*2,   0x3D5 | 1<<14);
@@ -552,7 +552,7 @@ void renderSprites(Level* l)
 		setTileXYb(i->x*2+1, i->y*2,   0x3DC + sprNum / 100 % 10);
 		setTileXYb(i->x*2,   i->y*2+1, 0x3DC + sprNum / 10 % 10);
 		setTileXYb(i->x*2+1, i->y*2+1, 0x3DC + sprNum / 1 % 10);
-		}
+		//}
 
 
 

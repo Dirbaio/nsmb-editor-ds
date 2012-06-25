@@ -1,2 +1,4 @@
+make clean
 make
+
 pause
