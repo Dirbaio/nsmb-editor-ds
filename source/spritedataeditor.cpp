@@ -121,7 +121,7 @@ void setnybbles (int nybble1, int nybble2, int value){
 		int x;
 		int y;
 		x=value/16;
-		y=value-(x*16);//No x*16 does NOT make scense
+		y=value-(x*16);//No x*16 does NOT make sense
 		printf("%d : %d,%d\n",value,x,y);
 		setnybble(nybble1,y);
 		setnybble(nybble2,x);
@@ -243,20 +243,18 @@ bool ReadForSprite(){
 void readSpriteData(const char* fname){
 	int type,snum;
 	f=fopen("sprdata.txt", "rb");
-	//chformat(); What is this used for goldenscruff ????? xDs
-		while (ReadForSprite()){
+		while (ReadForSprite())
+		{
 			snum=GetSpriteNum();
 			spritedatastruct[snum].gsd=true;
-			while((type=GetType())!=L_end || isd){
-				if (type==0){
-					isd=true;
-				}
-				if (type==L_checkbox){
-					chboxread(snum);
-
-				}
-				else if (type==L_number){
-					numberread(snum);
+			while((type=GetType())!=L_end || isd)
+			{
+				switch(type)
+				{
+					case 0: isd=true; break;
+					case L_checkbox: chboxread(snum); break;
+					case L_number: numberread(snum); break;
+					
 				}
 			}
 		}
@@ -290,7 +288,7 @@ void renderSpriteData(int snum)
 
 void editSpriteData(u8* sptr, string sa, string sb, int snum)
 {
-	printf("%d ,%d\n",spritedatastruct[snum].gsd, isd); //DEBUG STUFF????!?!?! :( :) :P :O O0OoO
+	//printf("%d ,%d\n",spritedatastruct[snum].gsd, isd); //DEBUG STUFF????!?!?! :( :) :P :O O0OoO
 	if (!spritedatastruct[snum].gsd || isd)
 	{
 		ptr = sptr;
@@ -345,10 +343,10 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		msg2 = sb;
 		string tmp;
 		char buf[5];
-		int values[8];
-		int oldvalue[8];
-		int oldnybble2[8];
-		int nybble2[8];
+		uint values[8];
+		uint oldvalue[8];
+		uint oldnybble2[8];
+		uint nybble2[8];
 	    	int i=0;
 		textScroll(0);
 		bool selecting = true;
@@ -374,17 +372,23 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 				else if (y>=2){
 					y-=2;
 					if (spritedatastruct[snum].type[y]==L_checkbox)
-						values[y]= !values[y];
-					else if (spritedatastruct[snum].type[y]==L_number){
+					{
+						if (values[y]>0) values[y]=0;
+						else values[y]=spritedatastruct[snum].take[y];
+					}
+					else if (spritedatastruct[snum].type[y]==L_number)
+					{
 						if (x==spritedatastruct[snum].headingsize[y]+1) values[y]++;
 						else if(x==spritedatastruct[snum].headingsize[y]+6) values[y]--;
+						if(values[y]<0) values[y]=0;
+						else if (values[y]>15) values[y]=15;
 					}
 					y+=2;
 				}
 			}
 			for(i=0;i<=7;i++){
 				if (spritedatastruct[snum].type[i]==L_checkbox){
-					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,values[i],&spritedatastruct[snum].heading[i][0]);
+					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,values[i]>0,&spritedatastruct[snum].heading[i][0]);
 				}
 				else if (spritedatastruct[snum].type[i]==L_number){
 					renderText(0,i+2,spritedatastruct[snum].headingsize[i]+1,0,&spritedatastruct[snum].heading[i][0]);
@@ -400,7 +404,7 @@ void editSpriteData(u8* sptr, string sa, string sb, int snum)
 		for (i=0;i<=7;i++){
 			if(values[i]!=oldvalue[i]){
 				setnybbles(spritedatastruct[snum].nybble[i],spritedatastruct[snum].nybble2[i],values[i]);
-				//printf("Setting nybble %d to  %d\n",spritedatastruct[snum].nybble[i],values[i]);
+				printf("Setting nybble %d to  %d\n",spritedatastruct[snum].nybble[i],values[i]);
 			}
 		}
 		textClearTransparent();
